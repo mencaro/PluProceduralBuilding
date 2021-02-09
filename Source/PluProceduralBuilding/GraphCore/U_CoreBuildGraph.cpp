@@ -18,6 +18,8 @@ void UU_CoreBuildGraph::IGraphRebuildCircuit_Implementation()
 	TNodes = SearchNodes();
 	TBranches = SearchBranches();
 	SearchReverseBranches();
+	II_GraphAction::Execute_IGraphRebuildNodeSpace(this);
+	//сформировать составляющие узла
 	GLog->Log("GraphRebuildCircuit_End");
 }
 TArray<AActor*> UU_CoreBuildGraph::SearchNodes()
