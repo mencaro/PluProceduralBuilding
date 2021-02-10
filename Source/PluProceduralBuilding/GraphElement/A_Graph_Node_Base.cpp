@@ -60,6 +60,7 @@ void AA_Graph_Node_Base::IGraphRebuildNodeSpace_Implementation()
 			{
 				ConnectionNodes[i].route_relatively_node = II_Branch::Execute_IGetRoute(ConnectionNodes[i].aConnectionBranch) * (-1);
 			}
+			ConnectionNodes[i].angle_route = ConnectionNodes[i].CalcAngle();
         }
 	}
 	else if (ConnectionNodes.Num() == 1)
