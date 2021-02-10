@@ -12,10 +12,12 @@
 #include "PluProceduralBuilding/Structs/U_DataStructures.h"
 #include "PluProceduralBuilding/ScriptLiblary/BFL_MathGraph.h"
 #include "Math/UnrealMath.h"
+#include "PluProceduralBuilding/Interfases/I_Branch.h"
+
 #include "A_Graph_Branch_Base.generated.h"
 
 UCLASS()
-class PLUPROCEDURALBUILDING_API AA_Graph_Branch_Base : public AActor, public II_GraphAction
+class PLUPROCEDURALBUILDING_API AA_Graph_Branch_Base : public AActor, public II_GraphAction, public  II_Branch
 {
 	GENERATED_BODY()
 
@@ -37,7 +39,7 @@ protected:
 	int wigthBranch_n2;
 	void IAddNode_Implementation(AActor* node, bool bTypeConnect, int wigth) override;
 	void IGraphRebuildSplinePoint_Implementation() override;
-	
+	FVector IGetRoute_Implementation() override;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	USplineComponent* splineMid;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)

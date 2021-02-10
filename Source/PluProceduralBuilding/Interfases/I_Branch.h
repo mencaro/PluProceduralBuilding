@@ -24,4 +24,6 @@ class PLUPROCEDURALBUILDING_API II_Branch
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
         void IRebuildSplinePoint();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
+        FVector IGetRoute();
 };

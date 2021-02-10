@@ -127,3 +127,7 @@ void AA_Graph_Branch_Base::BuildMeshSequence(USplineComponent* spline_,TArray<FB
 {
 	
 }
+FVector AA_Graph_Branch_Base::IGetRoute_Implementation()
+{
+	return routeBranch;
+}

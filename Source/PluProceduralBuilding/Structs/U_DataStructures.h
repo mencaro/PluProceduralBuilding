@@ -20,13 +20,17 @@ struct FConnectionType
 	int wightBranch;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AActor* aConnectionNode;
+	//
 	AActor* aConnectionBranch;
+	FVector route_relatively_node;
+	double angle_route;
 	//
 	FConnectionType()
 	{
 		bOrientationConnectNode = true;
 		wightBranch = 20;
 		aConnectionNode = nullptr;
+		angle_route = 0;
 	}
 	//
 	void AddConnectNode(AActor* act)
@@ -36,6 +40,10 @@ struct FConnectionType
 	void AddConnectBranch(AActor* act)
 	{
 		aConnectionBranch = act;
+	}
+	double CalcAngle()
+	{
+		return atan(route_relatively_node.Y / route_relatively_node.X);
 	}
 };
 

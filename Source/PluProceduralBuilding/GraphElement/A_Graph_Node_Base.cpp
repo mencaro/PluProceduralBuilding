@@ -3,6 +3,8 @@
 
 #include "A_Graph_Node_Base.h"
 
+#include "PluProceduralBuilding/Interfases/I_Branch.h"
+
 
 // Sets default values
 AA_Graph_Node_Base::AA_Graph_Node_Base()
@@ -46,7 +48,28 @@ int AA_Graph_Node_Base::IGetRangeOuts_Implementation()
 
 void AA_Graph_Node_Base::IGraphRebuildNodeSpace_Implementation()
 {
-	
+	if (ConnectionNodes.Num() > 1)
+	{
+		for(int i = 0; i < ConnectionNodes.Num(); i++)
+		{
+			if (ConnectionNodes[i].bOrientationConnectNode)
+			{
+				ConnectionNodes[i].route_relatively_node = II_Branch::Execute_IGetRoute(ConnectionNodes[i].aConnectionBranch);
+			}
+			else if (!ConnectionNodes[i].bOrientationConnectNode)
+			{
+				ConnectionNodes[i].route_relatively_node = II_Branch::Execute_IGetRoute(ConnectionNodes[i].aConnectionBranch) * (-1);
+			}
+        }
+	}
+	else if (ConnectionNodes.Num() == 1)
+	{
+		
+	}
+	else if (ConnectionNodes.Num() == 0)
+	{
+		
+	}
 }
 
 FConnectionType AA_Graph_Node_Base::ISearchBranchFromNodes_Implementation(AActor* node)
