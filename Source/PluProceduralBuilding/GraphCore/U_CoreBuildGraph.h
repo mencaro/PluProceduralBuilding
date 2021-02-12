@@ -28,7 +28,7 @@ class PLUPROCEDURALBUILDING_API UU_CoreBuildGraph : public UObject, public II_Gr
 		void IGraphRebuildNodeSpace_Implementation() override;
 	private:
 		TArray<AActor*> SearchNodes();
-		TArray<AActor*> SearchBranches();
+		void SearchBranches();
 		void SearchReverseBranches();
 		void GetAllActorsLevel(TArray<AActor*> &foundEnemies);
 	UFUNCTION(BlueprintPure)

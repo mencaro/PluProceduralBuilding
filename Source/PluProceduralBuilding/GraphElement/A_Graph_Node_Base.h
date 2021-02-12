@@ -25,11 +25,13 @@ protected:
 	///список соединений узла с остальными узлами графа
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TArray<FConnectionType> ConnectionNodes;
+	TArray<AActor*> ConnectionBranch;
 	///значение расширения узла - удаления входа веток от центра
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 		int rangeOuts;
 	///добавление узла связи в графе
 	void IAddNode_Implementation(AActor* node, bool bTypeConnect, int wigth) override;
+	void IAddBranch_Implementation(AActor* br) override;
 	int IGetRangeOuts_Implementation() override;
 	///получить список соединений узла с элементами графа
 	TArray<FConnectionType> IGetConnectionNode_Implementation() override;

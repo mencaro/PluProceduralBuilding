@@ -36,6 +36,10 @@ void AA_Graph_Node_Base::IAddNode_Implementation(AActor* node, bool bTypeConnect
 	if(bTypeConnect)
 		II_GraphAction::Execute_IAddNode(node, this, false, wigth);
 }
+void AA_Graph_Node_Base::IAddBranch_Implementation(AActor* br)
+{
+	ConnectionBranch.Add(br);
+}
 TArray<FConnectionType> AA_Graph_Node_Base::IGetConnectionNode_Implementation()
 {
 	return ConnectionNodes;
@@ -48,28 +52,23 @@ int AA_Graph_Node_Base::IGetRangeOuts_Implementation()
 
 void AA_Graph_Node_Base::IGraphRebuildNodeSpace_Implementation()
 {
-	if (ConnectionNodes.Num() > 1)
+	if (ConnectionBranch.Num() > 1)
 	{
-		for(int i = 0; i < ConnectionNodes.Num(); i++)
+		for(int i = 0; i < ConnectionBranch.Num(); i++)
 		{
-			if (ConnectionNodes[i].bOrientationConnectNode)
-			{
-				ConnectionNodes[i].route_relatively_node = II_Branch::Execute_IGetRoute(ConnectionNodes[i].aConnectionBranch);
-			}
-			else if (!ConnectionNodes[i].bOrientationConnectNode)
-			{
-				ConnectionNodes[i].route_relatively_node = II_Branch::Execute_IGetRoute(ConnectionNodes[i].aConnectionBranch) * (-1);
-			}
-			ConnectionNodes[i].angle_route = ConnectionNodes[i].CalcAngle();
+			FVector croute_relatively_node = II_Branch::Execute_IGetRoute(ConnectionBranch[i]);
+			double aangle_route = atan(croute_relatively_node.Y / croute_relatively_node.X);;
+			UE_LOG(LogTemp, Warning, TEXT("The float value is: %f"), aangle_route);
+			GLog->Log("IGraphRebuildNodeSpace_Implementation");
         }
 	}
-	else if (ConnectionNodes.Num() == 1)
+	else if (ConnectionBranch.Num() == 1)
 	{
-		
+		GLog->Log("ConnectionBranch.Num() == 1");
 	}
-	else if (ConnectionNodes.Num() == 0)
+	else if (ConnectionBranch.Num() == 0)
 	{
-		
+		GLog->Log("ConnectionBranch.Num() == 0");
 	}
 }
 

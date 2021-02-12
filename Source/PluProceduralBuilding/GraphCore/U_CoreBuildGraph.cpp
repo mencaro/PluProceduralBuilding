@@ -16,7 +16,7 @@ void UU_CoreBuildGraph::IGraphRebuildCircuit_Implementation()
 	TNodes.Reset(100);
 	TBranches.Reset(100);
 	TNodes = SearchNodes();
-	TBranches = SearchBranches();
+	SearchBranches();
 	SearchReverseBranches();
 	II_GraphAction::Execute_IGraphRebuildNodeSpace(this);
 	//сформировать составляющие узла
@@ -29,9 +29,8 @@ TArray<AActor*> UU_CoreBuildGraph::SearchNodes()
 	return foundEnemies;
 }
 
-TArray<AActor*> UU_CoreBuildGraph::SearchBranches()
+void UU_CoreBuildGraph::SearchBranches()
 {
-	TArray<AActor*> foundEnemies;
 	for(int i = 0; i < TNodes.Num(); i++)
 	{
 		TArray<FConnectionType> connections_ = II_GraphAction::Execute_IGetConnectionNode(TNodes[i]);
@@ -45,9 +44,9 @@ TArray<AActor*> UU_CoreBuildGraph::SearchBranches()
 					II_GraphAction::Execute_IAddNode(SpawnedActor1, TNodes[i], true, connections_[j].wightBranch);
 					II_GraphAction::Execute_IAddNode(SpawnedActor1, connections_[j].aConnectionNode, false, connections_[j].wightBranch);
 					II_GraphAction::Execute_IGraphRebuildSplinePoint(SpawnedActor1);
-					connections_[j].AddConnectBranch(SpawnedActor1);
+					II_GraphAction::Execute_IAddBranch(TNodes[i],(SpawnedActor1));
 					//настроить ветку, дать координары
-					foundEnemies.Add(SpawnedActor1);
+					TBranches.Add(SpawnedActor1);
 				}
 			}
 		}
@@ -57,7 +56,6 @@ TArray<AActor*> UU_CoreBuildGraph::SearchBranches()
 			//удалить ноду
 		}
 	}
-	return foundEnemies;
 }
 
 void UU_CoreBuildGraph::SearchReverseBranches()
