@@ -41,6 +41,7 @@ void AA_Graph_Branch_Base::IAddNode_Implementation(AActor* node, bool bTypeConne
 	else
 	{
 		Node2 = node;
+		II_GraphAction::Execute_IAddNode(Node2,Node1,false,wigth);
 	}
 	SetWightBranch(wigth,bTypeConnect);
 }
@@ -70,13 +71,13 @@ void AA_Graph_Branch_Base::CreateSplineAndPoint()
 		FVector n2 = Node2->GetActorLocation() + (routeBranch * (-1)) * II_NodeGraph::Execute_IGetRangeOuts(Node2);
 		AddStartEndDataToBranch(splineMid,n1,n2);
 		//
-		FVector n1_r = n1 + routeBranchNorm * wigthBranch_n1;
-		FVector n2_r = n2 + routeBranchNorm * wigthBranch_n1;
-		AddStartEndDataToBranch(splineRightSide,n1_r,n2_r);
+		point1_rigth = n1 + routeBranchNorm * wigthBranch_n1;
+		point2_rigth = n2 + routeBranchNorm * wigthBranch_n1;
+		AddStartEndDataToBranch(splineRightSide,point1_rigth,point2_rigth);
 		//
-		FVector n1_l = n1 + routeBranchNorm * (-1) * wigthBranch_n2;
-		FVector n2_l = n2 + routeBranchNorm * (-1) * wigthBranch_n2;
-		AddStartEndDataToBranch(splineLeftSide,n1_l,n2_l);
+		point1_left = n1 + routeBranchNorm * (-1) * wigthBranch_n2;
+		point2_left = n2 + routeBranchNorm * (-1) * wigthBranch_n2;
+		AddStartEndDataToBranch(splineLeftSide,point1_left,point2_left);
 	}
 }
 
@@ -127,7 +128,14 @@ void AA_Graph_Branch_Base::BuildMeshSequence(USplineComponent* spline_,TArray<FB
 {
 	
 }
-FVector AA_Graph_Branch_Base::IGetRoute_Implementation()
+FVector AA_Graph_Branch_Base::IGetRouteVectorBranch_Implementation()
 {
 	return routeBranch;
+}
+void AA_Graph_Branch_Base::IGetCalcPointBranch_Implementation(FVector& Point1R,FVector& Point2R,FVector& Point1L,FVector& Point2L)
+{
+	Point1R = point1_rigth;
+	Point2R = point2_rigth;
+	Point1L = point1_left;
+	Point2L = point2_left;
 }

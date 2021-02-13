@@ -35,11 +35,16 @@ protected:
 	AActor* Node2;//nodeOut;
 	///направляющий вектор ветки графа
 	FVector routeBranch;
+	FVector point1_rigth;
+	FVector point2_rigth;
+	FVector point1_left;
+	FVector point2_left;
 	int wigthBranch_n1;
 	int wigthBranch_n2;
 	void IAddNode_Implementation(AActor* node, bool bTypeConnect, int wigth) override;
 	void IGraphRebuildSplinePoint_Implementation() override;
-	FVector IGetRoute_Implementation() override;
+	FVector IGetRouteVectorBranch_Implementation() override;
+	void IGetCalcPointBranch_Implementation(FVector& Point1R,FVector& Point2R,FVector& Point1L,FVector& Point2L) override;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	USplineComponent* splineMid;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)

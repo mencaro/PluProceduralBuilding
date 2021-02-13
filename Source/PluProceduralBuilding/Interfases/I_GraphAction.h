@@ -29,6 +29,8 @@ public:
         void IAddBranch(AActor* br);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
         TArray<FConnectionType> IGetConnectionNode();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
+        void ISetConnectionNode(TArray<FConnectionType> &ct);
 	///пересобрать весь граф
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
         void IGraphRebuildCircuit();

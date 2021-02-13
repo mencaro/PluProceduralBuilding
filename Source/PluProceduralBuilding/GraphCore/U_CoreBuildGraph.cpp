@@ -44,11 +44,12 @@ void UU_CoreBuildGraph::SearchBranches()
 					II_GraphAction::Execute_IAddNode(SpawnedActor1, TNodes[i], true, connections_[j].wightBranch);
 					II_GraphAction::Execute_IAddNode(SpawnedActor1, connections_[j].aConnectionNode, false, connections_[j].wightBranch);
 					II_GraphAction::Execute_IGraphRebuildSplinePoint(SpawnedActor1);
-					II_GraphAction::Execute_IAddBranch(TNodes[i],(SpawnedActor1));
+					connections_[j].aConnectionBranch = SpawnedActor1;
 					//настроить ветку, дать координары
 					TBranches.Add(SpawnedActor1);
 				}
 			}
+			II_GraphAction::Execute_ISetConnectionNode(TNodes[i], connections_);
 		}
 		//если нет коннектов
 		if (connections_.Num()==0)
@@ -72,11 +73,12 @@ void UU_CoreBuildGraph::SearchReverseBranches()
 					FConnectionType searchReverseNode = II_GraphAction::Execute_ISearchBranchFromNodes(connections_[j].aConnectionNode,TNodes[i]);
 					if (searchReverseNode.aConnectionNode != nullptr)
 					{
-						connections_[j].AddConnectBranch(searchReverseNode.aConnectionBranch);
+						connections_[j].aConnectionBranch = searchReverseNode.aConnectionBranch;
 					}
 				}
 			}
 		}
+		II_GraphAction::Execute_ISetConnectionNode(TNodes[i], connections_);
 	}
 }
 void UU_CoreBuildGraph::IGraphRebuildNodeSpace_Implementation()

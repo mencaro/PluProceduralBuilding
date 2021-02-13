@@ -25,5 +25,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
         void IRebuildSplinePoint();
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
-        FVector IGetRoute();
+        FVector IGetRouteVectorBranch();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
+        void IGetCalcPointBranch(FVector& Point1R,FVector& Point2R,FVector& Point1L,FVector& Point2L);
 };

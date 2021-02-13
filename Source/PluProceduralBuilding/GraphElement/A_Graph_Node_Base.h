@@ -35,8 +35,11 @@ protected:
 	int IGetRangeOuts_Implementation() override;
 	///получить список соединений узла с элементами графа
 	TArray<FConnectionType> IGetConnectionNode_Implementation() override;
+	void ISetConnectionNode_Implementation(TArray<FConnectionType>& ct) override;
 	void IGraphRebuildNodeSpace_Implementation() override;
 	FConnectionType ISearchBranchFromNodes_Implementation(AActor* node) override;
+	void SortFoAngle();
+	void CreateSplineNode();
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

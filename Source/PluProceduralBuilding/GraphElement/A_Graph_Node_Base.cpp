@@ -3,6 +3,8 @@
 
 #include "A_Graph_Node_Base.h"
 
+
+#include "Components/SplineComponent.h"
 #include "PluProceduralBuilding/Interfases/I_Branch.h"
 
 
@@ -44,6 +46,10 @@ TArray<FConnectionType> AA_Graph_Node_Base::IGetConnectionNode_Implementation()
 {
 	return ConnectionNodes;
 }
+void AA_Graph_Node_Base::ISetConnectionNode_Implementation(TArray<FConnectionType>& ct)
+{
+	ConnectionNodes = ct;
+}
 
 int AA_Graph_Node_Base::IGetRangeOuts_Implementation()
 {
@@ -52,21 +58,30 @@ int AA_Graph_Node_Base::IGetRangeOuts_Implementation()
 
 void AA_Graph_Node_Base::IGraphRebuildNodeSpace_Implementation()
 {
-	if (ConnectionBranch.Num() > 1)
+	if (ConnectionNodes.Num() > 1)
 	{
-		for(int i = 0; i < ConnectionBranch.Num(); i++)
+		for(int i = 0; i < ConnectionNodes.Num(); i++)
 		{
-			FVector croute_relatively_node = II_Branch::Execute_IGetRoute(ConnectionBranch[i]);
-			double aangle_route = atan(croute_relatively_node.Y / croute_relatively_node.X);;
-			UE_LOG(LogTemp, Warning, TEXT("The float value is: %f"), aangle_route);
-			GLog->Log("IGraphRebuildNodeSpace_Implementation");
+			if(ConnectionNodes[i].aConnectionBranch != nullptr)
+			{
+				ConnectionNodes[i].route_relatively_node = II_Branch::Execute_IGetRouteVectorBranch(ConnectionNodes[i].aConnectionBranch);
+				if(!ConnectionNodes[i].bOrientationConnectNode)
+					ConnectionNodes[i].route_relatively_node *= -1;
+				ConnectionNodes[i].angle_route = atan(ConnectionNodes[i].route_relatively_node.X / ConnectionNodes[i].route_relatively_node.Y);
+				ConnectionNodes[i].angle_route = atan2(ConnectionNodes[i].route_relatively_node.X , ConnectionNodes[i].route_relatively_node.Y);
+				GLog->Log("IGraphRebuildNodeSpace_Implementation");
+			}
+			else
+				GLog->Log("ConnectionNodes[i].aConnectionBranch)==nullptr");
         }
+		SortFoAngle();
+		CreateSplineNode();
 	}
-	else if (ConnectionBranch.Num() == 1)
+	else if (ConnectionNodes.Num() == 1)
 	{
 		GLog->Log("ConnectionBranch.Num() == 1");
 	}
-	else if (ConnectionBranch.Num() == 0)
+	else if (ConnectionNodes.Num() == 0)
 	{
 		GLog->Log("ConnectionBranch.Num() == 0");
 	}
@@ -90,3 +105,119 @@ FConnectionType AA_Graph_Node_Base::ISearchBranchFromNodes_Implementation(AActor
 	else
 		return  FConnectionType();
 }
+
+void AA_Graph_Node_Base::SortFoAngle()
+{
+	for(int i = 0; i < ConnectionNodes.Num(); i++)
+	{
+		FConnectionType ct = ConnectionNodes[i];
+		for(int j = i+1; j < ConnectionNodes.Num(); j++)
+		{
+			if(ct.angle_route > ConnectionNodes[j].angle_route)
+			{
+				FConnectionType ct1 = ConnectionNodes[j];
+				ConnectionNodes[j] = ct;
+				ConnectionNodes[i] = ct1;
+				ct = ct1;
+			}
+		}
+	}
+	for(int i = 0; i < ConnectionNodes.Num(); i++)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("The VECTOR value is: %s"), *ConnectionNodes[i].route_relatively_node.ToString());
+		UE_LOG(LogTemp, Warning, TEXT("The РАДИАНЫ value is: %f"), ConnectionNodes[i].angle_route);
+		UE_LOG(LogTemp, Warning, TEXT("The ГРАДУСЫ value is: %f"), 90-ConnectionNodes[i].angle_route*(180/3.14));
+	}
+}
+
+void AA_Graph_Node_Base::CreateSplineNode()
+{
+	for(int i = 0; i < ConnectionNodes.Num(); i++)//ConnectionNodes.Num()
+	{
+		USplineComponent *Spline_ = NewObject<USplineComponent>(this, USplineComponent::StaticClass());
+		Spline_->RegisterComponentWithWorld(GetWorld());
+		USplineComponent *Spline_R1 = NewObject<USplineComponent>(this, USplineComponent::StaticClass());
+		Spline_R1->RegisterComponentWithWorld(GetWorld());
+		USplineComponent *Spline_L1 = NewObject<USplineComponent>(this, USplineComponent::StaticClass());
+		Spline_L1->RegisterComponentWithWorld(GetWorld());
+		USplineComponent *Spline_RL1 = NewObject<USplineComponent>(this, USplineComponent::StaticClass());
+		Spline_RL1->RegisterComponentWithWorld(GetWorld());
+
+		FVector Point1R_1;FVector Point2R_1;FVector Point1L_1;FVector Point2L_1;
+		FVector Point1R_2;FVector Point2R_2;FVector Point1L_2;FVector Point2L_2;
+		
+		//center
+		Spline_->SetLocationAtSplinePoint(0,this->GetActorLocation(),ESplineCoordinateSpace::Type::World);
+		Spline_->SetTangentAtSplinePoint(0,ConnectionNodes[i].route_relatively_node,ESplineCoordinateSpace::Type::World);
+		Spline_->SetLocationAtSplinePoint(1,this->GetActorLocation()+ConnectionNodes[i].route_relatively_node*rangeOuts,ESplineCoordinateSpace::Type::World);
+		Spline_->SetTangentAtSplinePoint(1,ConnectionNodes[i].route_relatively_node,ESplineCoordinateSpace::Type::World);
+		//right
+		II_Branch::Execute_IGetCalcPointBranch(ConnectionNodes[i].aConnectionBranch, Point1R_1, Point2R_1, Point1L_1, Point2L_1);
+		if(ConnectionNodes[i].bOrientationConnectNode)
+		{
+			Spline_R1->SetLocationAtSplinePoint(0,this->GetActorLocation(),ESplineCoordinateSpace::Type::World);
+			Spline_R1->SetTangentAtSplinePoint(0,ConnectionNodes[i].route_relatively_node,ESplineCoordinateSpace::Type::World);
+			Spline_R1->SetLocationAtSplinePoint(1,Point1R_1,ESplineCoordinateSpace::Type::World);
+			Spline_R1->SetTangentAtSplinePoint(1,ConnectionNodes[i].route_relatively_node,ESplineCoordinateSpace::Type::World);
+		}
+		else
+		{
+			Spline_R1->SetLocationAtSplinePoint(0,this->GetActorLocation(),ESplineCoordinateSpace::Type::World);
+			Spline_R1->SetTangentAtSplinePoint(0,ConnectionNodes[i].route_relatively_node,ESplineCoordinateSpace::Type::World);
+			Spline_R1->SetLocationAtSplinePoint(1,Point2R_1,ESplineCoordinateSpace::Type::World);
+			Spline_R1->SetTangentAtSplinePoint(1,ConnectionNodes[i].route_relatively_node,ESplineCoordinateSpace::Type::World);
+		}
+		//left
+		II_Branch::Execute_IGetCalcPointBranch(ConnectionNodes[i].aConnectionBranch, Point1R_1, Point2R_1, Point1L_1, Point2L_1);
+		if(ConnectionNodes[i].bOrientationConnectNode)
+		{
+			Spline_L1->SetLocationAtSplinePoint(0,this->GetActorLocation(),ESplineCoordinateSpace::Type::World);
+			Spline_L1->SetTangentAtSplinePoint(0,ConnectionNodes[i].route_relatively_node,ESplineCoordinateSpace::Type::World);
+			Spline_L1->SetLocationAtSplinePoint(1,Point1L_1,ESplineCoordinateSpace::Type::World);
+			Spline_L1->SetTangentAtSplinePoint(1,ConnectionNodes[i].route_relatively_node,ESplineCoordinateSpace::Type::World);
+		}
+		else
+		{
+			Spline_L1->SetLocationAtSplinePoint(0,this->GetActorLocation(),ESplineCoordinateSpace::Type::World);
+			Spline_L1->SetTangentAtSplinePoint(0,ConnectionNodes[i].route_relatively_node,ESplineCoordinateSpace::Type::World);
+			Spline_L1->SetLocationAtSplinePoint(1,Point2L_1,ESplineCoordinateSpace::Type::World);
+			Spline_L1->SetTangentAtSplinePoint(1,ConnectionNodes[i].route_relatively_node,ESplineCoordinateSpace::Type::World);
+		}
+		
+		int k = i + 1;
+		if(i == ConnectionNodes.Num()-1) {k = 0;}
+		
+		II_Branch::Execute_IGetCalcPointBranch(ConnectionNodes[i].aConnectionBranch, Point1R_1, Point2R_1, Point1L_1, Point2L_1);
+		II_Branch::Execute_IGetCalcPointBranch(ConnectionNodes[k].aConnectionBranch, Point1R_2, Point2R_2, Point1L_2, Point2L_2);
+		
+		if((ConnectionNodes[i].bOrientationConnectNode)&&(!ConnectionNodes[k].bOrientationConnectNode))
+		{
+			Spline_RL1->SetLocationAtSplinePoint(0,Point1R_1,ESplineCoordinateSpace::Type::World);
+			Spline_RL1->SetTangentAtSplinePoint(0,ConnectionNodes[i].route_relatively_node,ESplineCoordinateSpace::Type::World);
+			Spline_RL1->SetLocationAtSplinePoint(1,Point2R_2,ESplineCoordinateSpace::Type::World);
+			Spline_RL1->SetTangentAtSplinePoint(1,ConnectionNodes[i].route_relatively_node,ESplineCoordinateSpace::Type::World);
+		}
+		else if((!ConnectionNodes[i].bOrientationConnectNode)&&(ConnectionNodes[k].bOrientationConnectNode))
+		{
+			Spline_RL1->SetLocationAtSplinePoint(0,Point2L_1,ESplineCoordinateSpace::Type::World);
+			Spline_RL1->SetTangentAtSplinePoint(0,ConnectionNodes[i].route_relatively_node,ESplineCoordinateSpace::Type::World);
+			Spline_RL1->SetLocationAtSplinePoint(1,Point1L_2,ESplineCoordinateSpace::Type::World);
+			Spline_RL1->SetTangentAtSplinePoint(1,ConnectionNodes[i].route_relatively_node,ESplineCoordinateSpace::Type::World);
+		}
+		else if((ConnectionNodes[i].bOrientationConnectNode)&&(ConnectionNodes[k].bOrientationConnectNode))
+		{
+			Spline_RL1->SetLocationAtSplinePoint(0,Point1R_1,ESplineCoordinateSpace::Type::World);
+			Spline_RL1->SetTangentAtSplinePoint(0,ConnectionNodes[i].route_relatively_node,ESplineCoordinateSpace::Type::World);
+			Spline_RL1->SetLocationAtSplinePoint(1,Point1L_2,ESplineCoordinateSpace::Type::World);
+			Spline_RL1->SetTangentAtSplinePoint(1,ConnectionNodes[i].route_relatively_node,ESplineCoordinateSpace::Type::World);
+		}
+		else if((!ConnectionNodes[i].bOrientationConnectNode)&&(!ConnectionNodes[k].bOrientationConnectNode))
+		{
+			Spline_RL1->SetLocationAtSplinePoint(0,Point2L_1,ESplineCoordinateSpace::Type::World);
+			Spline_RL1->SetTangentAtSplinePoint(0,ConnectionNodes[i].route_relatively_node,ESplineCoordinateSpace::Type::World);
+			Spline_RL1->SetLocationAtSplinePoint(1,Point2R_2,ESplineCoordinateSpace::Type::World);
+			Spline_RL1->SetTangentAtSplinePoint(1,ConnectionNodes[i].route_relatively_node,ESplineCoordinateSpace::Type::World);
+		}
+	}
+}
+
