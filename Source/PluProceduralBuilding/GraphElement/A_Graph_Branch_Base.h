@@ -17,7 +17,7 @@
 #include "A_Graph_Branch_Base.generated.h"
 
 UCLASS()
-class PLUPROCEDURALBUILDING_API AA_Graph_Branch_Base : public AActor, public II_GraphAction, public  II_Branch
+class PLUPROCEDURALBUILDING_API AA_Graph_Branch_Base : public AActor, public II_BranchGraph, public II_GraphAction
 {
 	GENERATED_BODY()
 
@@ -42,8 +42,7 @@ protected:
 	int wigthBranch_n1;
 	int wigthBranch_n2;
 	void IAddNode_Implementation(AActor* node, bool bTypeConnect, int wigth) override;
-	void IGraphRebuildSplinePoint_Implementation() override;
-	FVector IGetRouteVectorBranch_Implementation() override;
+	//FVector IGetRouteVectorBranch_Implementation() override;
 	void IGetCalcPointBranch_Implementation(FVector& Point1R,FVector& Point2R,FVector& Point1L,FVector& Point2L) override;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	USplineComponent* splineMid;

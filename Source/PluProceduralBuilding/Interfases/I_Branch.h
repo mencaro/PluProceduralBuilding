@@ -8,7 +8,7 @@
 
 // This class does not need to be modified.
 UINTERFACE(BlueprintType, MinimalAPI)
-class UI_Branch : public UInterface
+class UI_BranchGraph : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,7 +16,7 @@ class UI_Branch : public UInterface
 /**
  * 
  */
-class PLUPROCEDURALBUILDING_API II_Branch
+class PLUPROCEDURALBUILDING_API II_BranchGraph
 {
 	GENERATED_BODY()
 	

@@ -52,10 +52,10 @@ void AA_Graph_Branch_Base::SetWightBranch(int w, bool bstart)
 	else
 		wigthBranch_n2 = w;
 }
-void AA_Graph_Branch_Base::IGraphRebuildSplinePoint_Implementation()
-{
-	CreateSplineAndPoint();
-}
+//void AA_Graph_Branch_Base::IGraphRebuildSplinePoint_Implementation()
+//{
+	//CreateSplineAndPoint();
+//}
 
 void AA_Graph_Branch_Base::CreateSplineAndPoint()
 {
@@ -128,10 +128,10 @@ void AA_Graph_Branch_Base::BuildMeshSequence(USplineComponent* spline_,TArray<FB
 {
 	
 }
-FVector AA_Graph_Branch_Base::IGetRouteVectorBranch_Implementation()
-{
-	return routeBranch;
-}
+//FVector AA_Graph_Branch_Base::IGetRouteVectorBranch_Implementation()
+//{
+//	return routeBranch;
+//}
 void AA_Graph_Branch_Base::IGetCalcPointBranch_Implementation(FVector& Point1R,FVector& Point2R,FVector& Point1L,FVector& Point2L)
 {
 	Point1R = point1_rigth;

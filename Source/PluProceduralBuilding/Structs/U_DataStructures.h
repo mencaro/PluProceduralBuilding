@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "Components/SplineComponent.h"
 #include "UObject/Object.h"
 #include "Components/SplineMeshComponent.h"
 #include "U_DataStructures.generated.h"
@@ -20,26 +22,35 @@ struct FConnectionType
 	int wightBranch;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AActor* aConnectionNode;
-	//
-	AActor* aConnectionBranch;
+	//метка была ли векка найдена и просчитано направление
+	bool bConnectionSearch;
+	//вектор направления ветки
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector route_relatively_node;
+	//точки
+	FVector Point1C; FVector Point2C;
+	FVector Point1R; FVector Point2R;
+	FVector Point1L; FVector Point2L;
+	//угол поворота относительно узла
 	double angle_route;
-	//
+	//внешние линии
+	USplineComponent *SplineMid;
+	USplineComponent *SplineRigth;
+	USplineComponent *SplineLeft;
 	FConnectionType()
 	{
 		bOrientationConnectNode = true;
 		wightBranch = 20;
-		aConnectionNode = nullptr;
+		bConnectionSearch = false;
 		angle_route = 0;
+		SplineMid = nullptr;
+		SplineLeft = nullptr;
+		SplineRigth = nullptr;
 	}
 	//
 	void AddConnectNode(AActor* act)
 	{
 		aConnectionNode = act;
-	}
-	void AddConnectBranch(AActor* act)
-	{
-		aConnectionBranch = act;
 	}
 	double CalcAngle()
 	{

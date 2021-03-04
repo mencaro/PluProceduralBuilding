@@ -36,7 +36,7 @@ public:
         void IGraphRebuildCircuit();
 	///перерасчитать точки сплайна у ветки
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
-        void IGraphRebuildSplinePoint();
+        void ICreateExternalGuideLines();
 	///пересобрать область пространства у узла графа
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
         void IGraphRebuildNodeSpace();

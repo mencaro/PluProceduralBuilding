@@ -10,7 +10,7 @@ UWorld* UU_CoreBuildGraph::GetWorld() const
 }
 void UU_CoreBuildGraph::IGraphRebuildCircuit_Implementation()
 {
-	GLog->Log("GraphRebuildCircuit_Start");	
+	/*GLog->Log("GraphRebuildCircuit_Start");	
 	TNodes.Empty();
 	TBranches.Empty();
 	TNodes.Reset(100);
@@ -20,7 +20,7 @@ void UU_CoreBuildGraph::IGraphRebuildCircuit_Implementation()
 	SearchReverseBranches();
 	II_GraphAction::Execute_IGraphRebuildNodeSpace(this);
 	//сформировать составляющие узла
-	GLog->Log("GraphRebuildCircuit_End");
+	GLog->Log("GraphRebuildCircuit_End");*/
 }
 TArray<AActor*> UU_CoreBuildGraph::SearchNodes()
 {
@@ -31,6 +31,7 @@ TArray<AActor*> UU_CoreBuildGraph::SearchNodes()
 
 void UU_CoreBuildGraph::SearchBranches()
 {
+	/*
 	for(int i = 0; i < TNodes.Num(); i++)
 	{
 		TArray<FConnectionType> connections_ = II_GraphAction::Execute_IGetConnectionNode(TNodes[i]);
@@ -57,11 +58,12 @@ void UU_CoreBuildGraph::SearchBranches()
 			//удалить ноду
 		}
 	}
+	*/
 }
 
 void UU_CoreBuildGraph::SearchReverseBranches()
 {
-	for(int i = 0; i < TNodes.Num(); i++)
+	/*for(int i = 0; i < TNodes.Num(); i++)
 	{
 		TArray<FConnectionType> connections_ = II_GraphAction::Execute_IGetConnectionNode(TNodes[i]);
 		if (connections_.Num()>0)
@@ -79,7 +81,7 @@ void UU_CoreBuildGraph::SearchReverseBranches()
 			}
 		}
 		II_GraphAction::Execute_ISetConnectionNode(TNodes[i], connections_);
-	}
+	}*/
 }
 void UU_CoreBuildGraph::IGraphRebuildNodeSpace_Implementation()
 {

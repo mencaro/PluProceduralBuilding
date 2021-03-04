@@ -7,6 +7,7 @@
 #include  "PluProceduralBuilding/Structs/U_DataStructures.h"
 #include  "PluProceduralBuilding/Interfases/I_GraphAction.h"
 #include  "PluProceduralBuilding/Interfases/I_Node.h"
+#include "PluProceduralBuilding/ScriptLiblary/BFL_MathGraph.h"
 #include "A_Graph_Node_Base.generated.h"
 
 UCLASS()
@@ -40,6 +41,9 @@ protected:
 	FConnectionType ISearchBranchFromNodes_Implementation(AActor* node) override;
 	void SortFoAngle();
 	void CreateSplineNode();
+	void ICreateExternalGuideLines_Implementation() override;
+	void CreateExternalGuideLines();
+	void AddStartEndDataToBranch(USplineComponent* spline_, FVector n1, FVector n2, FVector routeBranch);
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
