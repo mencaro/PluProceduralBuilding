@@ -9,6 +9,7 @@
 #include  "PluProceduralBuilding/Interfases/I_Branch.h"
 #include  "PluProceduralBuilding/GraphElement/A_Graph_Node_Base.h"
 #include "Kismet/GameplayStatics.h"
+#include "Misc/Guid.h"
 #include "AGraphCoreElement.generated.h"
 
 UCLASS(Blueprintable)
@@ -20,14 +21,21 @@ public:
 	// Sets default values for this actor's properties
 	AAGraphCoreElement();
 	virtual void OnConstruction(const FTransform& Transform) override;
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* SM;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	TArray<AActor*> TNodes;
-
+	TArray<UStaticMeshComponent*>SMArray;
+	TArray<USplineComponent*> SCArray;
+	TMap<FGuid,FArrayConnectionType> DataConnectNode;
 	void GetAllActorsLevel(TSubclassOf<UInterface> myInterfase,TArray<AActor*> &foundEnemies);
 	void SearchNodesInTheWorld();
 	void SearchBranches();
+	void AddLineToBranch(FString NameComponent, FVector Start, FVector End, FVector RouteBranch);
+	void AddStartEndDataToBranch(USplineComponent* Spline_, FVector Start, FVector End, FVector RouteBranch);
 	void IGraphRebuildNodeSpace_Implementation() override;
 	UFUNCTION(BlueprintCallable)
 		void CRSp();

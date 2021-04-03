@@ -24,11 +24,13 @@ class PLUPROCEDURALBUILDING_API II_GraphAction
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
+		FGuid IGetGUID();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
         void IAddNode(AActor* node, bool bTypeConnect, int wigth);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
         void IAddBranch(AActor* br);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
-        TArray<FConnectionType> IGetConnectionNode();
+        FArrayConnectionType IGetConnectionNode();
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
         void ISetConnectionNode(TArray<FConnectionType> &ct);
 	///пересобрать весь граф

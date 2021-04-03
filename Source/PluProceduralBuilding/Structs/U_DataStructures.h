@@ -22,42 +22,55 @@ struct FConnectionType
 	int wightBranch;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AActor* aConnectionNode;
-	//метка была ли векка найдена и просчитано направление
-	bool bConnectionSearch;
 	//вектор направления ветки
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector route_relatively_node;
+	//нормаль к ветке
+	FVector routeBranchNorm;
+	//
 	//точки
-	FVector Point1C; FVector Point2C;
-	FVector Point1R; FVector Point2R;
-	FVector Point1L; FVector Point2L;
+	FVector PointStart; FVector PointEnd;
+	FVector PointStart_R; FVector PointEnd_R;
+	FVector PointStart_L; FVector PointEnd_L;
 	//угол поворота относительно узла
 	double angle_route;
 	//внешние линии
-	USplineComponent *SplineMid;
-	USplineComponent *SplineRigth;
-	USplineComponent *SplineLeft;
+	
 	FConnectionType()
 	{
 		bOrientationConnectNode = true;
-		wightBranch = 20;
-		bConnectionSearch = false;
+		wightBranch = 40;
 		angle_route = 0;
-		SplineMid = nullptr;
-		SplineLeft = nullptr;
-		SplineRigth = nullptr;
+		
 	}
 	//
-	void AddConnectNode(AActor* act)
+	// void AddConnectNode(AActor* act)
+	// {
+	// 	aConnectionNode = act;
+	// }
+	// double CalcAngle()
+	// {
+	// 	return atan(route_relatively_node.Y / route_relatively_node.X);
+	// }
+};
+USTRUCT(BlueprintType)
+struct FArrayConnectionType
+{
+	GENERATED_BODY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FConnectionType> ArrayData;
+	FVector ThisMainPosition;
+	AActor* pointOnThis;
+	///значение расширения узла - удаления входа веток от центра
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int RangeOuts;
+	double angle0;
+	FArrayConnectionType()
 	{
-		aConnectionNode = act;
-	}
-	double CalcAngle()
-	{
-		return atan(route_relatively_node.Y / route_relatively_node.X);
+		RangeOuts = 150;
+		angle0 = -10000.0;
+		pointOnThis = nullptr;
 	}
 };
-
 USTRUCT(BlueprintType)
 struct FBranchComponent
 {
