@@ -10,7 +10,15 @@
 AAGraphCoreElement::AAGraphCoreElement()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.bCanEverTick = false;
+    mesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("GeneratedMesh"));
+    mesh->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+	//
+	mesh->bUseAsyncCooking = true;
+	eachTriangleNormal.Init(FVector(0.0f, 0.0f, 1.0f), 3);
+	eachTriangleTangents.Init(FProcMeshTangent(1.0f, 0.0f, 0.0f), 3);
+	eachTriangleVertexColors.Init(FLinearColor(0.0f, 0.0f, 0.0f, 1.0f), 3);
+	//
 	SM = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	SetRootComponent(SM);
 }
@@ -31,6 +39,125 @@ void AAGraphCoreElement::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 	CRSp();
+	CreateProceduralSections();
+}
+
+void AAGraphCoreElement::CreateProceduralSections()
+{
+	//
+	 vertices.Empty();
+	 Triangles.Empty();
+	 UV0.Empty();
+	// normals.Empty();
+	// vertexColors.Empty();
+	// tangents.Empty();
+	//
+	AddVertexFloor();
+	CreateSection();
+	mesh->ClearAllMeshSections();
+	mesh->CreateMeshSection_LinearColor(0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+	// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
+	// else mesh->SetMaterial(0, Material0);
+	mesh->ContainsPhysicsTriMeshData(true); //Enable collision data
+	//mesh->bUseComplexAsSimpleCollision = false;
+	//mesh->AddCollisionConvexMesh(vertices);
+	mesh->SetMobility(EComponentMobility::Static);
+	mesh->SetEnableGravity(false);
+}
+void AAGraphCoreElement::PostInitializeComponents()
+{
+	AActor::PostInitializeComponents();
+}
+
+void AAGraphCoreElement::PostActorCreated()
+{
+	AActor::PostActorCreated();
+}
+
+void AAGraphCoreElement::PostLoad()
+{
+	AActor::PostLoad();
+	vertices.Empty();
+	Triangles.Empty();
+	UV0.Empty();
+	normals.Empty();
+	vertexColors.Empty();
+	tangents.Empty();
+}
+void AAGraphCoreElement::AddVertexFloor()
+{
+	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
+	{
+		if (It.Value().ArrayData.Num()>0)
+		{
+			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
+			{
+				if(It.Value().ArrayData[i].bOrientationConnectNode)
+				{
+					vertices.Push(It.Value().ArrayData[i].PointStart);
+					vertices.Push(It.Value().ArrayData[i].PointStart_L);
+					vertices.Push(It.Value().ArrayData[i].PointEnd_L);
+					vertices.Push(It.Value().ArrayData[i].PointEnd);
+					vertices.Push(It.Value().ArrayData[i].PointEnd_R);
+					vertices.Push(It.Value().ArrayData[i].PointStart_R);
+				}
+			}
+		}
+	}
+}
+
+void AAGraphCoreElement::CreateSection()
+{
+	TArray<float> vertexXCoordinates;
+	vertexXCoordinates.Empty();
+	TArray<float> vertexYCoordinates;
+	vertexYCoordinates.Empty();
+	for (int i = 0; i < vertices.Num(); i++)
+	{
+		Point vertex;
+		vertex[0] = vertices[i].X;
+		vertex[1] = vertices[i].Y; 
+		vertexXCoordinates.Add(vertices[i].X);
+		vertexYCoordinates.Add(vertices[i].Y);
+		polygonVertices.push_back(vertex);
+	}
+	polygon.push_back(polygonVertices);
+	std::vector<N> indices = mapbox::earcut<N>(polygon);
+	//3 consecutive indices in clockwise order of the vertices of the input polygon.
+
+	int i = 0;
+	//creating triangles from these indices. Each iteration is a new triangle.
+	while ((i + 3) <= indices.size())
+	{
+		Triangles.Add((uint32_t)indices[i+2]); //assuming that the first triangle starts from 0
+		Triangles.Add((uint32_t)indices[i+1]);
+		Triangles.Add((uint32_t)indices[i]);
+		// Triangles.Add((uint32_t)indices[i]); //assuming that the first triangle starts from 0
+		// Triangles.Add((uint32_t)indices[i+1]);
+		// Triangles.Add((uint32_t)indices[i+2]);
+		normals.Append(eachTriangleNormal);
+		tangents.Append(eachTriangleTangents);
+		vertexColors.Append(eachTriangleVertexColors);
+		i += 3;
+	}
+		/*
+	UV mapping calculation - We need to map the 2D texture surface to the 2D junction surface.
+	We need to find the Xmax, Xmin, Ymax and Ymin of the polygon. Then we calculate Xrange and Yrange of the polygon.
+	After normalizing the coordinates of the vertices over this range, we can make the polygon fit over the 2D texture.
+	*/
+	float Xrange = FMath::Max(vertexXCoordinates) - FMath::Min(vertexXCoordinates);
+	float Yrange = FMath::Max(vertexYCoordinates) - FMath::Min(vertexYCoordinates);	
+	float minimumX = FMath::Min(vertexXCoordinates);
+	float minimumY = FMath::Min(vertexYCoordinates);
+	for (int32 i1 = 0; i1 < vertices.Num(); i1++) {
+		float X = (vertices[i1].X - minimumX) / 50.0f;
+		float Y = (vertices[i1].Y - minimumY) / 50.0f;
+		UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX X COORDINATE IS %d -=-=-=-="), X);
+		UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX Y COORDINATE IS %d -=-=-=-="), Y);
+		UV0.Add(FVector2D(X, Y));
+	}
+	vertexXCoordinates.Empty();
+	vertexYCoordinates.Empty();
 }
 void AAGraphCoreElement::CRSp()
 {
@@ -47,6 +174,7 @@ void AAGraphCoreElement::CRSp()
 	}
 	SCArray.Empty();
 	TNodes.Empty();
+	//
 	//Register all the components
 	RegisterAllComponents();
 	for (int32 i = 0; i < 20; i++)

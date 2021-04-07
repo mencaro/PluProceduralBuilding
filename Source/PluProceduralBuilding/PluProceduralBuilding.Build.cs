@@ -38,6 +38,7 @@ public class PluProceduralBuilding : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+				"ProceduralMeshComponent"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
