@@ -45,16 +45,18 @@ void AAGraphCoreElement::OnConstruction(const FTransform& Transform)
 void AAGraphCoreElement::CreateProceduralSections()
 {
 	//
-	 vertices.Empty();
-	 Triangles.Empty();
-	 UV0.Empty();
+	vertices.Empty();
+	//Triangles.Empty();
+	UV0.Empty();
 	// normals.Empty();
 	// vertexColors.Empty();
 	// tangents.Empty();
 	//
 	AddVertexFloor();
 	CreateSection();
-	mesh->ClearAllMeshSections();
+	
+	//mesh->ClearAllMeshSections();
+	//mesh->ClearNeedEndOfFrameUpdate();
 	mesh->CreateMeshSection_LinearColor(0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
 	// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
 	// else mesh->SetMaterial(0, Material0);
@@ -94,7 +96,7 @@ void AAGraphCoreElement::AddVertexFloor()
 			{
 				if(It.Value().ArrayData[i].bOrientationConnectNode)
 				{
-					vertices.Push(It.Value().ArrayData[i].PointStart);
+					//vertices.Push(It.Value().ArrayData[i].PointStart);
 					vertices.Push(It.Value().ArrayData[i].PointStart_L);
 					vertices.Push(It.Value().ArrayData[i].PointEnd_L);
 					vertices.Push(It.Value().ArrayData[i].PointEnd);
@@ -129,9 +131,9 @@ void AAGraphCoreElement::CreateSection()
 	//creating triangles from these indices. Each iteration is a new triangle.
 	while ((i + 3) <= indices.size())
 	{
-		Triangles.Add((uint32_t)indices[i+2]); //assuming that the first triangle starts from 0
-		Triangles.Add((uint32_t)indices[i+1]);
-		Triangles.Add((uint32_t)indices[i]);
+		Triangles.Push((uint32_t)indices[i+2]); //assuming that the first triangle starts from 0
+		Triangles.Push((uint32_t)indices[i+1]);
+		Triangles.Push((uint32_t)indices[i]);
 		// Triangles.Add((uint32_t)indices[i]); //assuming that the first triangle starts from 0
 		// Triangles.Add((uint32_t)indices[i+1]);
 		// Triangles.Add((uint32_t)indices[i+2]);
