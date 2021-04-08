@@ -11,10 +11,7 @@ AAGraphCoreElement::AAGraphCoreElement()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = false;
-    mesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("GeneratedMesh"));
-    mesh->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-	//
-	mesh->bUseAsyncCooking = true;
+    ///mesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("GeneratedMesh"));
 	eachTriangleNormal.Init(FVector(0.0f, 0.0f, 1.0f), 3);
 	eachTriangleTangents.Init(FProcMeshTangent(1.0f, 0.0f, 0.0f), 3);
 	eachTriangleVertexColors.Init(FLinearColor(0.0f, 0.0f, 0.0f, 1.0f), 3);
@@ -44,27 +41,91 @@ void AAGraphCoreElement::OnConstruction(const FTransform& Transform)
 
 void AAGraphCoreElement::CreateProceduralSections()
 {
-	//
-	vertices.Empty();
-	//Triangles.Empty();
-	UV0.Empty();
-	// normals.Empty();
-	// vertexColors.Empty();
-	// tangents.Empty();
-	//
-	AddVertexFloor();
-	CreateSection();
-	
-	//mesh->ClearAllMeshSections();
-	//mesh->ClearNeedEndOfFrameUpdate();
-	mesh->CreateMeshSection_LinearColor(0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
-	// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
-	// else mesh->SetMaterial(0, Material0);
-	mesh->ContainsPhysicsTriMeshData(true); //Enable collision data
-	//mesh->bUseComplexAsSimpleCollision = false;
-	//mesh->AddCollisionConvexMesh(vertices);
-	mesh->SetMobility(EComponentMobility::Static);
-	mesh->SetEnableGravity(false);
+	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
+	{
+		if (It.Value().ArrayData.Num()>0)
+		{
+			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
+			{
+				//
+				vertices.Empty();
+				//Triangles.Empty();
+				UV0.Empty();
+				normals.Empty();
+				vertexColors.Empty();
+				tangents.Empty();
+				//
+				if(It.Value().ArrayData[i].bOrientationConnectNode)
+				{
+					vertices.Push(It.Value().ArrayData[i].PointStart_L);
+					vertices.Push(It.Value().ArrayData[i].PointEnd_L);
+					vertices.Push(It.Value().ArrayData[i].PointEnd);
+					vertices.Push(It.Value().ArrayData[i].PointEnd_R);
+					vertices.Push(It.Value().ArrayData[i].PointStart_R);
+					//Change the name for the next possible item
+					FString Str = "MyPMC" + It.Key().ToString() + FString::FromInt(i+1);
+					//Convert the FString to FName
+					FName InitialName = (*Str);
+					UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName);
+					NewComp->RegisterComponent();
+					NewComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+					NewComp->bUseAsyncCooking = true;
+					CreateSection();
+					//mesh->ClearAllMeshSections();
+					//mesh->ClearNeedEndOfFrameUpdate();
+					NewComp->CreateMeshSection_LinearColor(0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
+					// else mesh->SetMaterial(0, Material0);
+					NewComp->ContainsPhysicsTriMeshData(true); //Enable collision data
+					//mesh->bUseComplexAsSimpleCollision = false;
+					//mesh->AddCollisionConvexMesh(vertices);
+					NewComp->SetMobility(EComponentMobility::Static);
+					NewComp->SetEnableGravity(false);
+					PMCArray.Add(NewComp);
+				}
+			}
+		}
+	}
+	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
+	{
+		//
+		vertices.Empty();
+		//Triangles.Empty();
+		UV0.Empty();
+		normals.Empty();
+		vertexColors.Empty();
+		tangents.Empty();
+		//
+		if (It.Value().ArrayData.Num()>0)
+		{
+			vertices.Push(It.Value().ThisMainPosition);
+			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
+			{
+				vertices.Push(It.Value().ArrayData[i].PointStart_L);
+				vertices.Push(It.Value().ArrayData[i].PointStart_R);
+			}
+			//Change the name for the next possible item
+			FString Str1 = "PMC_C" + It.Key().ToString() + FString::FromInt(1);
+			//Convert the FString to FName
+			FName InitialName1 = (*Str1);
+			UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName1);
+			NewComp->RegisterComponent();
+			NewComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+			NewComp->bUseAsyncCooking = true;
+			CreateSection();
+			//mesh->ClearAllMeshSections();
+			//mesh->ClearNeedEndOfFrameUpdate();
+			NewComp->CreateMeshSection_LinearColor(0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+			// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
+			// else mesh->SetMaterial(0, Material0);
+			NewComp->ContainsPhysicsTriMeshData(true); //Enable collision data
+			//mesh->bUseComplexAsSimpleCollision = false;
+			//mesh->AddCollisionConvexMesh(vertices);
+			NewComp->SetMobility(EComponentMobility::Static);
+			NewComp->SetEnableGravity(false);
+			PMCArray.Add(NewComp);
+		}
+	}
 }
 void AAGraphCoreElement::PostInitializeComponents()
 {
@@ -131,9 +192,9 @@ void AAGraphCoreElement::CreateSection()
 	//creating triangles from these indices. Each iteration is a new triangle.
 	while ((i + 3) <= indices.size())
 	{
-		Triangles.Push((uint32_t)indices[i+2]); //assuming that the first triangle starts from 0
-		Triangles.Push((uint32_t)indices[i+1]);
-		Triangles.Push((uint32_t)indices[i]);
+		Triangles.Add((uint32_t)indices[i+2]); //assuming that the first triangle starts from 0
+		Triangles.Add((uint32_t)indices[i+1]);
+		Triangles.Add((uint32_t)indices[i]);
 		// Triangles.Add((uint32_t)indices[i]); //assuming that the first triangle starts from 0
 		// Triangles.Add((uint32_t)indices[i+1]);
 		// Triangles.Add((uint32_t)indices[i+2]);
@@ -175,6 +236,12 @@ void AAGraphCoreElement::CRSp()
 		(*It)->DestroyComponent();
 	}
 	SCArray.Empty();
+	for (auto It = PMCArray.CreateIterator(); It; It++)
+	{
+		(*It)->DestroyComponent();
+	}
+	PMCArray.Empty();
+	//
 	TNodes.Empty();
 	//
 	//Register all the components

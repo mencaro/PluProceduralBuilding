@@ -39,11 +39,10 @@ protected:
 	TArray<UStaticMeshComponent*>SMArray;
 	///массив сплайнов
 	TArray<USplineComponent*> SCArray;
+	TArray<UProceduralMeshComponent*> PMCArray;
 	///структура сборки данных
 	TMap<FGuid,FArrayConnectionType> DataConnectNode;
-
 	//Процедурные моменты
-	UProceduralMeshComponent *mesh;
 	//To make sure that the vertices also get copied for every PIE instance (No loss of actor data)
 	UPROPERTY(NonPIEDuplicateTransient) 
 	TArray<FVector> vertices;
