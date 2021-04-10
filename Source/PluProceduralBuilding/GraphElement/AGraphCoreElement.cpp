@@ -47,19 +47,19 @@ void AAGraphCoreElement::CreateProceduralSections()
 		{
 			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
 			{
-				//
-				vertices.Empty();
-				//Triangles.Empty();
-				UV0.Empty();
-				normals.Empty();
-				vertexColors.Empty();
-				tangents.Empty();
-				//
 				if(It.Value().ArrayData[i].bOrientationConnectNode)
 				{
+					//
+					vertices.Empty();
+					Triangles.Empty();
+					UV0.Empty();
+					normals.Empty();
+					vertexColors.Empty();
+					tangents.Empty();
+					//
 					vertices.Push(It.Value().ArrayData[i].PointStart_L);
 					vertices.Push(It.Value().ArrayData[i].PointEnd_L);
-					vertices.Push(It.Value().ArrayData[i].PointEnd);
+					//vertices.Push(It.Value().ArrayData[i].PointEnd);
 					vertices.Push(It.Value().ArrayData[i].PointEnd_R);
 					vertices.Push(It.Value().ArrayData[i].PointStart_R);
 					//Change the name for the next possible item
@@ -88,17 +88,17 @@ void AAGraphCoreElement::CreateProceduralSections()
 	}
 	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
 	{
-		//
-		vertices.Empty();
-		//Triangles.Empty();
-		UV0.Empty();
-		normals.Empty();
-		vertexColors.Empty();
-		tangents.Empty();
-		//
 		if (It.Value().ArrayData.Num()>0)
 		{
-			vertices.Push(It.Value().ThisMainPosition);
+		    //
+            vertices.Empty();
+            Triangles.Empty();
+            UV0.Empty();
+            normals.Empty();
+            vertexColors.Empty();
+            tangents.Empty();
+            //
+			//vertices.Push(It.Value().ThisMainPosition);
 			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
 			{
 				vertices.Push(It.Value().ArrayData[i].PointStart_L);
@@ -175,6 +175,8 @@ void AAGraphCoreElement::CreateSection()
 	vertexXCoordinates.Empty();
 	TArray<float> vertexYCoordinates;
 	vertexYCoordinates.Empty();
+	polygonVertices.clear();
+	polygon.clear();
 	for (int i = 0; i < vertices.Num(); i++)
 	{
 		Point vertex;
