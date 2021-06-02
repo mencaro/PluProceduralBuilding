@@ -247,30 +247,30 @@ void AAGraphCoreElement::CreateProceduralSections()
 			}
 		}
 	}
+	//стенки
 	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
 	{
 		if (It.Value().ArrayData.Num()>0)
 		{
 			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
 			{
-				ClearProceduralElements();
 				if(It.Value().ArrayData[i].bOrientationConnectNode)
 				{
+					ClearProceduralElements();
 					FVector a_vec = It.Value().ArrayData[i].PointStart_Rw - It.Value().ArrayData[i].PointStart_R;
 					FVector b_vec = It.Value().ArrayData[i].PointEnd_R - It.Value().ArrayData[i].PointStart_R;
 					FVector n_vec;
 					n_vec = n_vec.CrossProduct(a_vec,b_vec);
+					n_vec *= -1;
 					nTriangleNormal.Empty();
 					nTriangleNormal.Init(n_vec, 3);
 					pTriangleTangents.Empty();
 					pTriangleTangents.Init(FProcMeshTangent(1.0f, 0.0f, 0.0f), 3);
-					vertices.Push(It.Value().ArrayData[i].PointStart_Rw);
-					vertices.Push(It.Value().ArrayData[i].PointEnd_Rw);
-					vertices.Push(It.Value().ArrayData[i].PointEnd_R);
-					vertices.Push(It.Value().ArrayData[i].PointStart_R);
-					//Change the name for the next possible item
-					FString Str = "MyPMC_kr" + It.Key().ToString() + FString::FromInt(i+1);
-					//Convert the FString to FName
+					vertices.Push(It.Value().ArrayData[i].PointStart_Lw);
+					vertices.Push(It.Value().ArrayData[i].PointEnd_Lw);
+					vertices.Push(It.Value().ArrayData[i].PointEnd_L);
+					vertices.Push(It.Value().ArrayData[i].PointStart_L);
+					FString Str = "MyPMC_Kl" + It.Key().ToString() + FString::FromInt(i+1);
 					FName InitialName = (*Str);
 					UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName);
 					NewComp->RegisterComponent();
@@ -489,17 +489,17 @@ void AAGraphCoreElement::CreateSection(TArray<FVector> nTN, TArray<FProcMeshTang
 {
 	TArray<float> vertexXCoordinates;
 	vertexXCoordinates.Empty();
-	TArray<float> vertexYCoordinates;
-	vertexYCoordinates.Empty();
+	TArray<float> vertexZCoordinates;
+	vertexZCoordinates.Empty();
 	polygonVertices.clear();
 	polygon.clear();
 	for (int i = 0; i < vertices.Num(); i++)
 	{
 		Point vertex;
-		vertex[0] = vertices[i].X;
-		vertex[1] = vertices[i].Y; 
-		vertexXCoordinates.Add(vertices[i].X);
-		vertexYCoordinates.Add(vertices[i].Y);
+		vertex[0] = vertices[i].Y;
+		vertex[1] = vertices[i].Z;
+		vertexXCoordinates.Add(vertices[i].Y);
+		vertexZCoordinates.Add(vertices[i].Z);
 		polygonVertices.push_back(vertex);
 	}
 	polygon.push_back(polygonVertices);
@@ -527,18 +527,18 @@ void AAGraphCoreElement::CreateSection(TArray<FVector> nTN, TArray<FProcMeshTang
 	After normalizing the coordinates of the vertices over this range, we can make the polygon fit over the 2D texture.
 	*/
 	float Xrange = FMath::Max(vertexXCoordinates) - FMath::Min(vertexXCoordinates);
-	float Yrange = FMath::Max(vertexYCoordinates) - FMath::Min(vertexYCoordinates);	
+	float Yrange = FMath::Max(vertexZCoordinates) - FMath::Min(vertexZCoordinates);	
 	float minimumX = FMath::Min(vertexXCoordinates);
-	float minimumY = FMath::Min(vertexYCoordinates);
+	float minimumZ = FMath::Min(vertexZCoordinates);
 	for (int32 i1 = 0; i1 < vertices.Num(); i1++) {
-		float X = (vertices[i1].X - minimumX) / 50.0f;
-		float Y = (vertices[i1].Y - minimumY) / 50.0f;
+		float X = (vertices[i1].Y - minimumX) / 50.0f;
+		float Y = (vertices[i1].Z - minimumZ) / 50.0f;
 		UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX X COORDINATE IS %d -=-=-=-="), X);
 		UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX Y COORDINATE IS %d -=-=-=-="), Y);
 		UV0.Add(FVector2D(X, Y));
 	}
 	vertexXCoordinates.Empty();
-	vertexYCoordinates.Empty();
+	vertexZCoordinates.Empty();
 }
 void AAGraphCoreElement::ClearAllBuilding()
 {
