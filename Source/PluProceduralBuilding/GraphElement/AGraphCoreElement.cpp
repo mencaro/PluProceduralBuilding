@@ -24,7 +24,6 @@ AAGraphCoreElement::AAGraphCoreElement()
 void AAGraphCoreElement::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -42,6 +41,7 @@ void AAGraphCoreElement::OnConstruction(const FTransform& Transform)
 void AAGraphCoreElement::CreateProceduralSections()
 {
 	float g1 = 2.79; float g2 = 3.1;
+	//ветки
 	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
 	{
 		if (It.Value().ArrayData.Num()>0)
@@ -50,13 +50,7 @@ void AAGraphCoreElement::CreateProceduralSections()
 			{
 				if(It.Value().ArrayData[i].bOrientationConnectNode)
 				{
-					//
-					vertices.Empty();
-					Triangles.Empty();
-					UV0.Empty();
-					normals.Empty();
-					vertexColors.Empty();
-					tangents.Empty();
+					ClearProceduralElements();
 					//
 					vertices.Push(It.Value().ArrayData[i].PointStart_L);
 					vertices.Push(It.Value().ArrayData[i].PointEnd_L);
@@ -86,16 +80,10 @@ void AAGraphCoreElement::CreateProceduralSections()
 			}
 		}
 	}
+	//узлы
 	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
 	{
-		//
-		vertices.Empty();
-		Triangles.Empty();
-		UV0.Empty();
-		normals.Empty();
-		vertexColors.Empty();
-		tangents.Empty();
-		//
+		ClearProceduralElements();
 		if (It.Value().ArrayData.Num()>0)
 		{
 			if (It.Value().ArrayData.Num() == 2)
@@ -223,6 +211,87 @@ void AAGraphCoreElement::CreateProceduralSections()
 			}
 		}
 	}
+	//крышка
+	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
+	{
+		if (It.Value().ArrayData.Num()>0)
+		{
+			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
+			{
+				if(It.Value().ArrayData[i].bOrientationConnectNode)
+				{
+					ClearProceduralElements();
+					vertices.Push(It.Value().ArrayData[i].PointStart_Lw);
+					vertices.Push(It.Value().ArrayData[i].PointEnd_Lw);
+					vertices.Push(It.Value().ArrayData[i].PointEnd_Rw);
+					vertices.Push(It.Value().ArrayData[i].PointStart_Rw);
+					FString Str = "MyPMC_K" + It.Key().ToString() + FString::FromInt(i+1);
+					FName InitialName = (*Str);
+					UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName);
+					NewComp->RegisterComponent();
+					NewComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+					NewComp->bUseAsyncCooking = true;
+					CreateSection();
+					//mesh->ClearAllMeshSections();
+					//mesh->ClearNeedEndOfFrameUpdate();
+					NewComp->CreateMeshSection_LinearColor(0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
+					// else mesh->SetMaterial(0, Material0);
+					NewComp->ContainsPhysicsTriMeshData(true); //Enable collision data
+					//mesh->bUseComplexAsSimpleCollision = false;
+					//mesh->AddCollisionConvexMesh(vertices);
+					NewComp->SetMobility(EComponentMobility::Static);
+					NewComp->SetEnableGravity(false);
+					ProceduralMeshes.Add(NewComp);
+				}
+			}
+		}
+	}
+	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
+	{
+		if (It.Value().ArrayData.Num()>0)
+		{
+			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
+			{
+				ClearProceduralElements();
+				if(It.Value().ArrayData[i].bOrientationConnectNode)
+				{
+					FVector a_vec = It.Value().ArrayData[i].PointStart_Rw - It.Value().ArrayData[i].PointStart_R;
+					FVector b_vec = It.Value().ArrayData[i].PointEnd_R - It.Value().ArrayData[i].PointStart_R;
+					FVector n_vec;
+					n_vec = n_vec.CrossProduct(a_vec,b_vec);
+					nTriangleNormal.Empty();
+					nTriangleNormal.Init(n_vec, 3);
+					pTriangleTangents.Empty();
+					pTriangleTangents.Init(FProcMeshTangent(1.0f, 0.0f, 0.0f), 3);
+					vertices.Push(It.Value().ArrayData[i].PointStart_Rw);
+					vertices.Push(It.Value().ArrayData[i].PointEnd_Rw);
+					vertices.Push(It.Value().ArrayData[i].PointEnd_R);
+					vertices.Push(It.Value().ArrayData[i].PointStart_R);
+					//Change the name for the next possible item
+					FString Str = "MyPMC_kr" + It.Key().ToString() + FString::FromInt(i+1);
+					//Convert the FString to FName
+					FName InitialName = (*Str);
+					UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName);
+					NewComp->RegisterComponent();
+					NewComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+					NewComp->bUseAsyncCooking = true;
+					CreateSection(nTriangleNormal,pTriangleTangents);
+					//mesh->ClearAllMeshSections();
+					//mesh->ClearNeedEndOfFrameUpdate();
+					NewComp->CreateMeshSection_LinearColor(0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
+					// else mesh->SetMaterial(0, Material0);
+					NewComp->ContainsPhysicsTriMeshData(true); //Enable collision data
+					//mesh->bUseComplexAsSimpleCollision = false;
+					//mesh->AddCollisionConvexMesh(vertices);
+					NewComp->SetMobility(EComponentMobility::Static);
+					NewComp->SetEnableGravity(false);
+					ProceduralMeshes.Add(NewComp);
+				}
+			}
+		}
+	}
 }
 
 void AAGraphCoreElement::PostInitializeComponents()
@@ -245,6 +314,7 @@ void AAGraphCoreElement::PostLoad()
 	vertexColors.Empty();
 	tangents.Empty();
 }
+
 void AAGraphCoreElement::AddVertexFloor()
 {
 	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
@@ -415,6 +485,61 @@ void AAGraphCoreElement::CreateSection()
 	vertexYCoordinates.Empty();
 }
 
+void AAGraphCoreElement::CreateSection(TArray<FVector> nTN, TArray<FProcMeshTangent> pTT)
+{
+	TArray<float> vertexXCoordinates;
+	vertexXCoordinates.Empty();
+	TArray<float> vertexYCoordinates;
+	vertexYCoordinates.Empty();
+	polygonVertices.clear();
+	polygon.clear();
+	for (int i = 0; i < vertices.Num(); i++)
+	{
+		Point vertex;
+		vertex[0] = vertices[i].X;
+		vertex[1] = vertices[i].Y; 
+		vertexXCoordinates.Add(vertices[i].X);
+		vertexYCoordinates.Add(vertices[i].Y);
+		polygonVertices.push_back(vertex);
+	}
+	polygon.push_back(polygonVertices);
+	std::vector<N> indices = mapbox::earcut<N>(polygon);
+	//3 consecutive indices in clockwise order of the vertices of the input polygon.
+
+	int i = 0;
+	//creating triangles from these indices. Each iteration is a new triangle.
+	while ((i + 3) <= indices.size())
+	{
+		Triangles.Add((uint32_t)indices[i+2]); //assuming that the first triangle starts from 0
+		Triangles.Add((uint32_t)indices[i+1]);
+		Triangles.Add((uint32_t)indices[i]);
+		// Triangles.Add((uint32_t)indices[i]); //assuming that the first triangle starts from 0
+		// Triangles.Add((uint32_t)indices[i+1]);
+		// Triangles.Add((uint32_t)indices[i+2]);
+		normals.Append(nTN);
+		tangents.Append(pTT);
+		vertexColors.Append(eachTriangleVertexColors);
+		i += 3;
+	}
+		/*
+	UV mapping calculation - We need to map the 2D texture surface to the 2D junction surface.
+	We need to find the Xmax, Xmin, Ymax and Ymin of the polygon. Then we calculate Xrange and Yrange of the polygon.
+	After normalizing the coordinates of the vertices over this range, we can make the polygon fit over the 2D texture.
+	*/
+	float Xrange = FMath::Max(vertexXCoordinates) - FMath::Min(vertexXCoordinates);
+	float Yrange = FMath::Max(vertexYCoordinates) - FMath::Min(vertexYCoordinates);	
+	float minimumX = FMath::Min(vertexXCoordinates);
+	float minimumY = FMath::Min(vertexYCoordinates);
+	for (int32 i1 = 0; i1 < vertices.Num(); i1++) {
+		float X = (vertices[i1].X - minimumX) / 50.0f;
+		float Y = (vertices[i1].Y - minimumY) / 50.0f;
+		UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX X COORDINATE IS %d -=-=-=-="), X);
+		UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX Y COORDINATE IS %d -=-=-=-="), Y);
+		UV0.Add(FVector2D(X, Y));
+	}
+	vertexXCoordinates.Empty();
+	vertexYCoordinates.Empty();
+}
 void AAGraphCoreElement::ClearAllBuilding()
 {
 	for (auto It = StaticMeshes.CreateIterator(); It; It++)
@@ -433,6 +558,18 @@ void AAGraphCoreElement::ClearAllBuilding()
 	SplineComponents.Empty();
 	ProceduralMeshes.Empty();
 	TNodes.Empty();
+}
+
+void AAGraphCoreElement::ClearProceduralElements()
+{
+	//
+	vertices.Empty();
+	Triangles.Empty();
+	UV0.Empty();
+	normals.Empty();
+	vertexColors.Empty();
+	tangents.Empty();
+	//
 }
 
 void AAGraphCoreElement::ClearSearchAndRegisterAllComponentsNodesAndBranch()
@@ -524,6 +661,15 @@ void AAGraphCoreElement::SearchBranches()
                             It.Value().ArrayData[i].PointStart + It.Value().ArrayData[i].routeBranchNorm * (-1) * It.Value().ArrayData[i].wightBranch;
 						It.Value().ArrayData[i].PointEnd_L =
                             It.Value().ArrayData[i].PointEnd + It.Value().ArrayData[i].routeBranchNorm * (-1) * It.Value().ArrayData[i].wightBranch;
+						//
+						It.Value().ArrayData[i].PointStart_Rw =It.Value().ArrayData[i].PointStart_R;
+						It.Value().ArrayData[i].PointStart_Rw.Z =It.Value().ArrayData[i].PointStart_R.Z + 150;
+						It.Value().ArrayData[i].PointEnd_Rw = It.Value().ArrayData[i].PointEnd_R;
+						It.Value().ArrayData[i].PointEnd_Rw.Z = It.Value().ArrayData[i].PointEnd_R.Z + 150;
+						It.Value().ArrayData[i].PointStart_Lw = It.Value().ArrayData[i].PointStart_L;
+						It.Value().ArrayData[i].PointStart_Lw.Z = It.Value().ArrayData[i].PointStart_L.Z + 150;
+						It.Value().ArrayData[i].PointEnd_Lw = It.Value().ArrayData[i].PointEnd_L;
+						It.Value().ArrayData[i].PointEnd_Lw.Z = It.Value().ArrayData[i].PointEnd_L.Z + 150;
 					}
 				}
 			}
@@ -560,6 +706,20 @@ void AAGraphCoreElement::SearchBranches()
                         It.Value().ArrayData[i].PointEnd_L,
                         It.Value().ArrayData[i].route_relatively_node
                     );
+					AddLineToBranch
+					(
+						"SC_Right_w" + It.Key().ToString() + FString::FromInt(i+1),
+						It.Value().ArrayData[i].PointStart_Rw,
+						It.Value().ArrayData[i].PointEnd_Rw,
+						It.Value().ArrayData[i].route_relatively_node
+					);
+					AddLineToBranch
+					(
+						"SC_Left_w" + It.Key().ToString() + FString::FromInt(i+1),
+						It.Value().ArrayData[i].PointStart_Lw,
+						It.Value().ArrayData[i].PointEnd_Lw,
+						It.Value().ArrayData[i].route_relatively_node
+					);
 				}
 			}
 		}

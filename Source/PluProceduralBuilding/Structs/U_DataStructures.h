@@ -29,8 +29,12 @@ struct FConnectionType
 	//
 	//точки
 	FVector PointStart; FVector PointEnd;
+	//
 	FVector PointStart_R; FVector PointEnd_R;
 	FVector PointStart_L; FVector PointEnd_L;
+	//крышка
+	FVector PointStart_Rw; FVector PointEnd_Rw;
+	FVector PointStart_Lw; FVector PointEnd_Lw;
 	//угол поворота относительно узла
 	double angle_route;
 	//внешние линии

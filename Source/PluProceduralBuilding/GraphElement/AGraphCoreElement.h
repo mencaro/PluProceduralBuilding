@@ -53,7 +53,9 @@ protected:
 	TArray<FProcMeshTangent> tangents;
 	TArray<FLinearColor> vertexColors;
 	//temp triangle arrays
+	TArray<FVector> nTriangleNormal;
 	TArray<FVector> eachTriangleNormal;
+	TArray<FProcMeshTangent> pTriangleTangents;
 	TArray<FProcMeshTangent> eachTriangleTangents;
 	TArray<FLinearColor> eachTriangleVertexColors;
 	//
@@ -75,7 +77,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
         void CreateProceduralSections();
 	void CreateSection();
+	void CreateSection(TArray<FVector> nTN, TArray<FProcMeshTangent> pTT);
 	void ClearAllBuilding();
+	void ClearProceduralElements();
 	void AddVertexFloor();
 	void GraphRebuildNodeSpace();
 public:
