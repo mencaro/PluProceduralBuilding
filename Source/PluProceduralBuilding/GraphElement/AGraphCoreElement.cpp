@@ -35,12 +35,13 @@ void AAGraphCoreElement::Tick(float DeltaTime)
 void AAGraphCoreElement::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
-	CRSp();
+	ClearSearchAndRegisterAllComponentsNodesAndBranch();
 	CreateProceduralSections();
 }
 
 void AAGraphCoreElement::CreateProceduralSections()
 {
+	float g1 = 2.79; float g2 = 3.1;
 	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
 	{
 		if (It.Value().ArrayData.Num()>0)
@@ -59,7 +60,6 @@ void AAGraphCoreElement::CreateProceduralSections()
 					//
 					vertices.Push(It.Value().ArrayData[i].PointStart_L);
 					vertices.Push(It.Value().ArrayData[i].PointEnd_L);
-					//vertices.Push(It.Value().ArrayData[i].PointEnd);
 					vertices.Push(It.Value().ArrayData[i].PointEnd_R);
 					vertices.Push(It.Value().ArrayData[i].PointStart_R);
 					//Change the name for the next possible item
@@ -81,52 +81,150 @@ void AAGraphCoreElement::CreateProceduralSections()
 					//mesh->AddCollisionConvexMesh(vertices);
 					NewComp->SetMobility(EComponentMobility::Static);
 					NewComp->SetEnableGravity(false);
-					PMCArray.Add(NewComp);
+					ProceduralMeshes.Add(NewComp);
 				}
 			}
 		}
 	}
 	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
 	{
+		//
+		vertices.Empty();
+		Triangles.Empty();
+		UV0.Empty();
+		normals.Empty();
+		vertexColors.Empty();
+		tangents.Empty();
+		//
 		if (It.Value().ArrayData.Num()>0)
 		{
-		    //
-            vertices.Empty();
-            Triangles.Empty();
-            UV0.Empty();
-            normals.Empty();
-            vertexColors.Empty();
-            tangents.Empty();
-            //
-			//vertices.Push(It.Value().ThisMainPosition);
-			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
+			if (It.Value().ArrayData.Num() == 2)
 			{
-				vertices.Push(It.Value().ArrayData[i].PointStart_L);
-				vertices.Push(It.Value().ArrayData[i].PointStart_R);
+				float a = It.Value().ArrayData[0].route_relatively_node.DotProduct(It.Value().ArrayData[0].route_relatively_node,It.Value().ArrayData[1].route_relatively_node);
+				a = acos(a);
+				UE_LOG(LogTemp, Warning, TEXT("МЕЖДУ ЛИНИЯМИ: %f"), a);
+				if ((a > g1) && (a <g2))
+				{
+					for(int i = 0; i < It.Value().ArrayData.Num(); i++)
+					{
+						vertices.Push(It.Value().ArrayData[i].PointStart_L);
+						vertices.Push(It.Value().ArrayData[i].PointStart_R);
+					}
+					//Change the name for the next possible item
+					FString Str1 = "PMC_C" + It.Key().ToString() + FString::FromInt(1);
+					//Convert the FString to FName
+					FName InitialName1 = (*Str1);
+					UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName1);
+					NewComp->RegisterComponent();
+					NewComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+					NewComp->bUseAsyncCooking = true;
+					CreateSection();
+					//mesh->ClearAllMeshSections();
+					//mesh->ClearNeedEndOfFrameUpdate();
+					NewComp->CreateMeshSection_LinearColor(0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
+					// else mesh->SetMaterial(0, Material0);
+					NewComp->ContainsPhysicsTriMeshData(true); //Enable collision data
+					//mesh->bUseComplexAsSimpleCollision = false;
+					//mesh->AddCollisionConvexMesh(vertices);
+					NewComp->SetMobility(EComponentMobility::Static);
+					NewComp->SetEnableGravity(false);
+					ProceduralMeshes.Add(NewComp);
+				}
+				else if ((a > g2))
+				{
+					for(int i = 0; i < It.Value().ArrayData.Num(); i++)
+					{
+						vertices.Push(It.Value().ArrayData[i].PointStart_L);
+						vertices.Push(It.Value().ArrayData[i].PointStart_R);
+						if (i == 0)
+						{
+							vertices.Push(It.Value().ThisMainPosition);
+						}
+					}
+					//Change the name for the next possible item
+					FString Str1 = "PMC_C" + It.Key().ToString() + FString::FromInt(1);
+					//Convert the FString to FName
+					FName InitialName1 = (*Str1);
+					UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName1);
+					NewComp->RegisterComponent();
+					NewComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+					NewComp->bUseAsyncCooking = true;
+					CreateSection();
+					//mesh->ClearAllMeshSections();
+					//mesh->ClearNeedEndOfFrameUpdate();
+					NewComp->CreateMeshSection_LinearColor(0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
+					// else mesh->SetMaterial(0, Material0);
+					NewComp->ContainsPhysicsTriMeshData(true); //Enable collision data
+					//mesh->bUseComplexAsSimpleCollision = false;
+					//mesh->AddCollisionConvexMesh(vertices);
+					NewComp->SetMobility(EComponentMobility::Static);
+					NewComp->SetEnableGravity(false);
+					ProceduralMeshes.Add(NewComp);
+				}
+				else if ((a < g1))
+				{
+					for(int i = 0; i < It.Value().ArrayData.Num(); i++)
+					{
+						vertices.Push(It.Value().ArrayData[i].PointStart_L);
+						vertices.Push(It.Value().ArrayData[i].PointStart_R);
+					}
+					vertices.Push(It.Value().ThisMainPosition);
+					//Change the name for the next possible item
+					FString Str1 = "PMC_C" + It.Key().ToString() + FString::FromInt(1);
+					//Convert the FString to FName
+					FName InitialName1 = (*Str1);
+					UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName1);
+					NewComp->RegisterComponent();
+					NewComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+					NewComp->bUseAsyncCooking = true;
+					CreateSection();
+					//mesh->ClearAllMeshSections();
+					//mesh->ClearNeedEndOfFrameUpdate();
+					NewComp->CreateMeshSection_LinearColor(0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
+					// else mesh->SetMaterial(0, Material0);
+					NewComp->ContainsPhysicsTriMeshData(true); //Enable collision data
+					//mesh->bUseComplexAsSimpleCollision = false;
+					//mesh->AddCollisionConvexMesh(vertices);
+					NewComp->SetMobility(EComponentMobility::Static);
+					NewComp->SetEnableGravity(false);
+					ProceduralMeshes.Add(NewComp);
+				}
 			}
-			//Change the name for the next possible item
-			FString Str1 = "PMC_C" + It.Key().ToString() + FString::FromInt(1);
-			//Convert the FString to FName
-			FName InitialName1 = (*Str1);
-			UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName1);
-			NewComp->RegisterComponent();
-			NewComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
-			NewComp->bUseAsyncCooking = true;
-			CreateSection();
-			//mesh->ClearAllMeshSections();
-			//mesh->ClearNeedEndOfFrameUpdate();
-			NewComp->CreateMeshSection_LinearColor(0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
-			// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
-			// else mesh->SetMaterial(0, Material0);
-			NewComp->ContainsPhysicsTriMeshData(true); //Enable collision data
-			//mesh->bUseComplexAsSimpleCollision = false;
-			//mesh->AddCollisionConvexMesh(vertices);
-			NewComp->SetMobility(EComponentMobility::Static);
-			NewComp->SetEnableGravity(false);
-			PMCArray.Add(NewComp);
+			else
+			{
+				for(int i = 0; i < It.Value().ArrayData.Num(); i++)
+				{
+					vertices.Push(It.Value().ArrayData[i].PointStart_L);
+					vertices.Push(It.Value().ArrayData[i].PointStart_R);
+				}
+				//Change the name for the next possible item
+				FString Str1 = "PMC_C" + It.Key().ToString() + FString::FromInt(1);
+				//Convert the FString to FName
+				FName InitialName1 = (*Str1);
+				UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName1);
+				NewComp->RegisterComponent();
+				NewComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+				NewComp->bUseAsyncCooking = true;
+				CreateSection();
+				//mesh->ClearAllMeshSections();
+				//mesh->ClearNeedEndOfFrameUpdate();
+				NewComp->CreateMeshSection_LinearColor(0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
+				// else mesh->SetMaterial(0, Material0);
+				NewComp->ContainsPhysicsTriMeshData(true); //Enable collision data
+				//mesh->bUseComplexAsSimpleCollision = false;
+				//mesh->AddCollisionConvexMesh(vertices);
+				NewComp->SetMobility(EComponentMobility::Static);
+				NewComp->SetEnableGravity(false);
+				ProceduralMeshes.Add(NewComp);
+			}
 		}
 	}
 }
+
 void AAGraphCoreElement::PostInitializeComponents()
 {
 	AActor::PostInitializeComponents();
@@ -164,6 +262,98 @@ void AAGraphCoreElement::AddVertexFloor()
 					vertices.Push(It.Value().ArrayData[i].PointEnd_R);
 					vertices.Push(It.Value().ArrayData[i].PointStart_R);
 				}
+			}
+		}
+	}
+}
+
+void AAGraphCoreElement::GraphRebuildNodeSpace()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ДЕЛАЕМ ЛИНИИ МЕЖДУ ЛИНИЯМИ: %d"), 0);
+	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
+	{
+		if (It.Value().ArrayData.Num()>0)
+		{
+			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("СЧИТАЕМ УГЛЫ=: %d"), i);
+				{
+					It.Value().ArrayData[i].angle_route = atan2(It.Value().ArrayData[i].route_relatively_node.X , It.Value().ArrayData[i].route_relatively_node.Y);
+				}
+			}
+		}
+	}
+	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
+	{
+		if (It.Value().ArrayData.Num()>0)
+		{
+			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
+			{
+				FConnectionType ct = It.Value().ArrayData[i];
+				for(int j = i+1; j < It.Value().ArrayData.Num(); j++)
+				{
+					if(ct.angle_route > It.Value().ArrayData[j].angle_route)
+					{
+						FConnectionType ct1 = It.Value().ArrayData[j];
+						It.Value().ArrayData[j] = ct;
+						It.Value().ArrayData[i] = ct1;
+						ct = ct1;
+					}
+				}
+			}
+		}
+	}
+	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
+	{
+		if (It.Value().ArrayData.Num()>0)
+		{
+			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("The УГОЛ: %f"), It.Value().ArrayData[i].angle_route);
+			}
+		}
+	}
+	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
+	{
+		if (It.Value().ArrayData.Num()>0)
+		{
+			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
+			{
+				//center
+				AddLineToBranch
+                (
+                    "SC_CenterNode_" + It.Key().ToString() + FString::FromInt(i+1),
+                    It.Value().ThisMainPosition,
+                    It.Value().ArrayData[i].PointStart,//It.Value().ThisMainPosition + It.Value().ArrayData[i].route_relatively_node * It.Value().RangeOuts,
+                    It.Value().ArrayData[i].route_relatively_node
+                );
+				// //right
+				AddLineToBranch
+                (
+                    "SC_CenterNodeRight_" + It.Key().ToString() + FString::FromInt(i+1),
+                    It.Value().ThisMainPosition,
+                    It.Value().ArrayData[i].PointStart_R,
+                    It.Value().ArrayData[i].route_relatively_node
+                );
+				//left
+				AddLineToBranch
+                (
+                    "SC_CenterNodeLeft_" + It.Key().ToString() + FString::FromInt(i+1),
+                    It.Value().ThisMainPosition,
+                    It.Value().ArrayData[i].PointStart_L,
+                    It.Value().ArrayData[i].route_relatively_node
+                );
+				
+				int k = i + 1;
+				if(i == It.Value().ArrayData.Num()-1) {k = 0;}
+    
+				AddLineToBranch
+                (
+                    "SC_RightLeftNode_" + It.Key().ToString() + FString::FromInt(i+1),
+                    It.Value().ArrayData[i].PointStart_R,
+                    It.Value().ArrayData[k].PointStart_L,
+                    It.Value().ArrayData[i].route_relatively_node
+                );
 			}
 		}
 	}
@@ -224,54 +414,34 @@ void AAGraphCoreElement::CreateSection()
 	vertexXCoordinates.Empty();
 	vertexYCoordinates.Empty();
 }
-void AAGraphCoreElement::CRSp()
+
+void AAGraphCoreElement::ClearAllBuilding()
 {
-	//The base name for all our components
-	FName InitialName = FName("MyCompName");
-	for (auto It = SMArray.CreateIterator(); It; It++)
+	for (auto It = StaticMeshes.CreateIterator(); It; It++)
 	{
 		(*It)->DestroyComponent();
 	}
-	SMArray.Empty();
-	for (auto It = SCArray.CreateIterator(); It; It++)
+	for (auto It = SplineComponents.CreateIterator(); It; It++)
 	{
 		(*It)->DestroyComponent();
 	}
-	SCArray.Empty();
-	for (auto It = PMCArray.CreateIterator(); It; It++)
+	for (auto It = ProceduralMeshes.CreateIterator(); It; It++)
 	{
 		(*It)->DestroyComponent();
 	}
-	PMCArray.Empty();
-	//
+	StaticMeshes.Empty();
+	SplineComponents.Empty();
+	ProceduralMeshes.Empty();
 	TNodes.Empty();
-	//
-	//Register all the components
-	RegisterAllComponents();
-	for (int32 i = 0; i < 20; i++)
-	{
-		//Change the name for the next possible item
-		FString Str = "MyCompName" + FString::FromInt(i+1);
-		//Convert the FString to FName
-		InitialName = (*Str);
-		UStaticMeshComponent* NewComp = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass(),InitialName);
-		NewComp->RegisterComponent();
-		NewComp->SetStaticMesh(SM->GetStaticMesh());
-		//Set a random location based on the values we enter through the editor
-		FVector Location;
-		//Set the random seed in case we need to change our random values
-		FMath::SRandInit(5);
-		Location.X += FMath::RandRange(-FMath::Abs(3), FMath::Abs(3));
-		Location.Y += FMath::RandRange(-FMath::Abs(4), FMath::Abs(4));
-		NewComp->SetWorldLocation(Location);
-		//NewSpline->RegisterComponentWithWorld(GetWorld());
-		NewComp->AttachToComponent(GetRootComponent(),FAttachmentTransformRules::KeepRelativeTransform);
-		SMArray.Add(NewComp);
-	}
-	//
+}
+
+void AAGraphCoreElement::ClearSearchAndRegisterAllComponentsNodesAndBranch()
+{
+	ClearAllBuilding();
+	RegisterAllComponents();//Register all the components
 	SearchNodesInTheWorld();
 	SearchBranches();
-	II_GraphAction::Execute_IGraphRebuildNodeSpace(this);
+	GraphRebuildNodeSpace();
 }
 void AAGraphCoreElement::GetAllActorsLevel(TSubclassOf<UInterface> myInterfase, TArray<AActor*> &foundEnemies)
 {
@@ -397,94 +567,7 @@ void AAGraphCoreElement::SearchBranches()
 }
 void AAGraphCoreElement::IGraphRebuildNodeSpace_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ДЕЛАЕМ ЛИНИИ МЕЖДУ ЛИНИЯМИ: %d"), 0);
-	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
-	{
-		if (It.Value().ArrayData.Num()>0)
-		{
-			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("СЧИТАЕМ УГЛЫ=: %d"), i);
-				{
-					It.Value().ArrayData[i].angle_route = atan2(It.Value().ArrayData[i].route_relatively_node.X , It.Value().ArrayData[i].route_relatively_node.Y);
-				}
-			}
-		}
-	}
-	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
-	{
-		if (It.Value().ArrayData.Num()>0)
-		{
-			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
-			{
-				FConnectionType ct = It.Value().ArrayData[i];
-				for(int j = i+1; j < It.Value().ArrayData.Num(); j++)
-				{
-					if(ct.angle_route > It.Value().ArrayData[j].angle_route)
-					{
-						FConnectionType ct1 = It.Value().ArrayData[j];
-						It.Value().ArrayData[j] = ct;
-						It.Value().ArrayData[i] = ct1;
-						ct = ct1;
-					}
-				}
-			}
-		}
-	}
-	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
-	{
-		if (It.Value().ArrayData.Num()>0)
-		{
-			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("The УГОЛ: %f"), It.Value().ArrayData[i].angle_route);
-			}
-		}
-	}
-	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
-	{
-		if (It.Value().ArrayData.Num()>0)
-		{
-			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
-			{
-				//center
-				AddLineToBranch
-                (
-                    "SC_CenterNode_" + It.Key().ToString() + FString::FromInt(i+1),
-                    It.Value().ThisMainPosition,
-                    It.Value().ArrayData[i].PointStart,//It.Value().ThisMainPosition + It.Value().ArrayData[i].route_relatively_node * It.Value().RangeOuts,
-                    It.Value().ArrayData[i].route_relatively_node
-                );
-				// //right
-				AddLineToBranch
-                (
-                    "SC_CenterNodeRight_" + It.Key().ToString() + FString::FromInt(i+1),
-                    It.Value().ThisMainPosition,
-                    It.Value().ArrayData[i].PointStart_R,
-                    It.Value().ArrayData[i].route_relatively_node
-                );
-				//left
-				AddLineToBranch
-                (
-                    "SC_CenterNodeLeft_" + It.Key().ToString() + FString::FromInt(i+1),
-                    It.Value().ThisMainPosition,
-                    It.Value().ArrayData[i].PointStart_L,
-                    It.Value().ArrayData[i].route_relatively_node
-                );
-				
-				int k = i + 1;
-				if(i == It.Value().ArrayData.Num()-1) {k = 0;}
-    
-				AddLineToBranch
-                (
-                    "SC_RightLeftNode_" + It.Key().ToString() + FString::FromInt(i+1),
-                    It.Value().ArrayData[i].PointStart_R,
-                    It.Value().ArrayData[k].PointStart_L,
-                    It.Value().ArrayData[i].route_relatively_node
-                );
-			}
-		}
-	}
+	GraphRebuildNodeSpace();
 }
 
 void AAGraphCoreElement::AddLineToBranch(FString NameComponent, FVector Start, FVector End, FVector RouteBranch)
@@ -493,7 +576,7 @@ void AAGraphCoreElement::AddLineToBranch(FString NameComponent, FVector Start, F
 	USplineComponent* SC = NewObject<USplineComponent>(this, USplineComponent::StaticClass(), InitialName);
 	SC->RegisterComponent();
 	AddStartEndDataToBranch(SC,Start,End,RouteBranch);
-	SCArray.Add(SC);
+	SplineComponents.Add(SC);
 }
 void AAGraphCoreElement::AddStartEndDataToBranch(USplineComponent* Spline_, FVector Start, FVector End, FVector RouteBranch)
 {
@@ -503,3 +586,27 @@ void AAGraphCoreElement::AddStartEndDataToBranch(USplineComponent* Spline_, FVec
 	Spline_->SetLocationAtSplinePoint(1,End,ESplineCoordinateSpace::Type::World);
 	Spline_->SetTangentAtSplinePoint(1,RouteBranch,ESplineCoordinateSpace::Type::World);
 }
+
+
+
+//for (int32 i = 0; i < 20; i++)
+//{
+	////Change the name for the next possible item
+	//FString Str = "MyCompName" + FString::FromInt(i+1);
+	////Convert the FString to FName
+	//InitialName = (*Str);
+	//UStaticMeshComponent* NewComp = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass(),InitialName);
+	//NewComp->RegisterComponent();
+	//NewComp->SetStaticMesh(SM->GetStaticMesh());
+	////Set a random location based on the values we enter through the editor
+	//FVector Location;
+	////Set the random seed in case we need to change our random values
+	//FMath::SRandInit(5);
+	//Location.X += FMath::RandRange(-FMath::Abs(3), FMath::Abs(3));
+	//Location.Y += FMath::RandRange(-FMath::Abs(4), FMath::Abs(4));
+	//NewComp->SetWorldLocation(Location);
+	//NewSpline->RegisterComponentWithWorld(GetWorld());
+	//NewComp->AttachToComponent(GetRootComponent(),FAttachmentTransformRules::KeepRelativeTransform);
+	//StaticMeshes.Add(NewComp);
+//}
+//

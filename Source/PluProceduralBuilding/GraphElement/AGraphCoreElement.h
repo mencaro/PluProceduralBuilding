@@ -36,10 +36,11 @@ protected:
 	///массив узлов
 	TArray<AActor*> TNodes;
 	///массив мешей
-	TArray<UStaticMeshComponent*>SMArray;
+	TArray<UStaticMeshComponent*> StaticMeshes;
 	///массив сплайнов
-	TArray<USplineComponent*> SCArray;
-	TArray<UProceduralMeshComponent*> PMCArray;
+	TArray<USplineComponent*> SplineComponents;
+	///массив процедурных мешей
+	TArray<UProceduralMeshComponent*> ProceduralMeshes;
 	///структура сборки данных
 	TMap<FGuid,FArrayConnectionType> DataConnectNode;
 	//Процедурные моменты
@@ -70,11 +71,13 @@ protected:
 	void AddStartEndDataToBranch(USplineComponent* Spline_, FVector Start, FVector End, FVector RouteBranch);
 	void IGraphRebuildNodeSpace_Implementation() override;
 	UFUNCTION(BlueprintCallable)
-		void CRSp();
+		void ClearSearchAndRegisterAllComponentsNodesAndBranch();
 	UFUNCTION(BlueprintCallable)
         void CreateProceduralSections();
 	void CreateSection();
+	void ClearAllBuilding();
 	void AddVertexFloor();
+	void GraphRebuildNodeSpace();
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
