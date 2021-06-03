@@ -5,5 +5,5 @@
 
 FVector UBFL_MathGraph::FindRouteVectorBranch(FVector n1, FVector n2)
 {
-	return  (n2-n1);
+	return (n2 - n1);
 }

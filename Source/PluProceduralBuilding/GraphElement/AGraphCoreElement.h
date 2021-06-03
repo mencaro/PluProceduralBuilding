@@ -66,6 +66,9 @@ protected:
 	std::vector<std::vector<Point>> polygon;
 	std::vector<Point> polygonVertices;
 	//
+	bool bX_target;
+	bool bY_target;
+	//
 	void GetAllActorsLevel(TSubclassOf<UInterface> myInterfase,TArray<AActor*> &foundEnemies);
 	void SearchNodesInTheWorld();
 	void SearchBranches();
@@ -76,12 +79,13 @@ protected:
 		void ClearSearchAndRegisterAllComponentsNodesAndBranch();
 	UFUNCTION(BlueprintCallable)
         void CreateProceduralSections();
-	void CreateSection();
-	void CreateSection(TArray<FVector> nTN, TArray<FProcMeshTangent> pTT);
+	void CreateSection(bool bReverseTriangle, TArray<FVector> nTN);
+	void CreateSection(bool bReverseTriangle,TArray<FVector> nTN, TArray<FProcMeshTangent> pTT);
 	void ClearAllBuilding();
 	void ClearProceduralElements();
 	void AddVertexFloor();
 	void GraphRebuildNodeSpace();
+	FVector SetNormalToFloor(FVector a,FVector b,FVector c, int i);
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

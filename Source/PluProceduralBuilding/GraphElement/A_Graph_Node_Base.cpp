@@ -51,6 +51,8 @@ void AA_Graph_Node_Base::IAddBranch_Implementation(AActor* br)
 FArrayConnectionType AA_Graph_Node_Base::IGetConnectionNode_Implementation()
 {
 	ConnectionNodes.ThisMainPosition = this->GetActorLocation();
+	ConnectionNodes.ThisMainPositionW = this->GetActorLocation();
+	ConnectionNodes.ThisMainPositionW.Z = ConnectionNodes.ThisMainPositionW.Z + 150;
 	ConnectionNodes.pointOnThis = this;
 	return ConnectionNodes;
 }

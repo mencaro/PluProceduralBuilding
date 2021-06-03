@@ -63,6 +63,7 @@ struct FArrayConnectionType
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FConnectionType> ArrayData;
 	FVector ThisMainPosition;
+	FVector ThisMainPositionW;
 	AActor* pointOnThis;
 	///значение расширения узла - удаления входа веток от центра
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
