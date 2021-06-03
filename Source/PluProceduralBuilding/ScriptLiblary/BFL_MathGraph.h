@@ -15,4 +15,6 @@ class PLUPROCEDURALBUILDING_API UBFL_MathGraph : public UBlueprintFunctionLibrar
 	GENERATED_BODY()
 	public:
 	static FVector FindRouteVectorBranch(FVector n1, FVector n2);
+	static bool FindFocusVecToVecByX(FVector n1);
+	static bool FindFocusVecToVecByY(FVector n1);
 };

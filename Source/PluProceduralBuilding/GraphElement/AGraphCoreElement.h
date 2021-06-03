@@ -80,7 +80,8 @@ protected:
 	UFUNCTION(BlueprintCallable)
         void CreateProceduralSections();
 	void CreateSection(bool bReverseTriangle, TArray<FVector> nTN);
-	void CreateSection(bool bReverseTriangle,TArray<FVector> nTN, TArray<FProcMeshTangent> pTT);
+	void CreateSectionWall(bool bReverseTriangle,TArray<FVector> nTN);
+	void CreateSectionNode(bool bReverseTriangle,TArray<FVector> nTN);
 	void ClearAllBuilding();
 	void ClearProceduralElements();
 	void AddVertexFloor();
