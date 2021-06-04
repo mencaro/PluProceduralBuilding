@@ -82,6 +82,7 @@ protected:
 	void CreateSection(bool bReverseTriangle, TArray<FVector> nTN);
 	void CreateSectionWall(bool bReverseTriangle,TArray<FVector> nTN);
 	void CreateSectionNode(bool bReverseTriangle,TArray<FVector> nTN);
+	void CreateSectionNode0(bool bReverseTriangle,TArray<FVector> nTN);
 	void ClearAllBuilding();
 	void ClearProceduralElements();
 	void AddVertexFloor();

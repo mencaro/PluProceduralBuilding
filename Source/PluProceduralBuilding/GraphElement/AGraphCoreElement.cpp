@@ -419,7 +419,6 @@ void AAGraphCoreElement::CreateProceduralSections()
 					FVector b_vec = It.Value().ArrayData[i].PointEnd_R - It.Value().ArrayData[i].PointStart_R;
 					FVector n_vec;
 					n_vec = n_vec.CrossProduct(b_vec,a_vec);
-					n_vec *= -1;
 					//________________________________________________________________________________________________________
 					bX_target = UBFL_MathGraph::FindFocusVecToVecByX(It.Value().ArrayData[i].route_relatively_node);
 					bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[i].route_relatively_node);
@@ -507,15 +506,17 @@ void AAGraphCoreElement::CreateProceduralSections()
 	//узлы стены
 	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
 	{
-		if (It.Value().ArrayData.Num()>1)
+		if (It.Value().ArrayData.Num() > 2)
 		{
 			for(int i = 0; i < It.Value().ArrayData.Num()-1; i++)
 			{
 				ClearProceduralElements();
+				
 				vertices.Push(It.Value().ArrayData[i].PointStart_R);
 				vertices.Push(It.Value().ArrayData[i].PointStart_Rw);
 				vertices.Push(It.Value().ArrayData[i+1].PointStart_Lw);
 				vertices.Push(It.Value().ArrayData[i+1].PointStart_L);
+				
 				nTriangleNormal.Empty();
 				nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[i].PointStart_L,It.Value().ArrayData[i].PointStart_R,It.Value().ThisMainPosition, 1), 3);
 				//______________________________________________________________________________________________________
@@ -523,7 +524,7 @@ void AAGraphCoreElement::CreateProceduralSections()
 				bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[i].route_relatively_node);
 				//______________________________________________________________________________________________________
 				//Change the name for the next possible item
-				FString Str1 = "PMC_Cs1" + It.Key().ToString() + FString::FromInt(1);
+				FString Str1 = "PMC_Cs1" + It.Key().ToString() + FString::FromInt(i);
 				//Convert the FString to FName
 				FName InitialName1 = (*Str1);
 				UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName1);
@@ -544,19 +545,57 @@ void AAGraphCoreElement::CreateProceduralSections()
 				ProceduralMeshes.Add(NewComp);
 			}
 			//
+			ClearProceduralElements();
+			vertices.Push(It.Value().ArrayData[0].PointStart_L);
+			vertices.Push(It.Value().ArrayData[0].PointStart_Lw);
+			vertices.Push(It.Value().ArrayData[It.Value().ArrayData.Num()-1].PointStart_Rw);
+			vertices.Push(It.Value().ArrayData[It.Value().ArrayData.Num()-1].PointStart_R);
+			nTriangleNormal.Empty();
+			nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[0].PointStart_R,It.Value().ThisMainPosition, 1), 3);
+			//______________________________________________________________________________________________________
+			bX_target = UBFL_MathGraph::FindFocusVecToVecByX(It.Value().ArrayData[It.Value().ArrayData.Num()-1].route_relatively_node);
+			bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[It.Value().ArrayData.Num()-1].route_relatively_node);
+			//______________________________________________________________________________________________________
+			//Change the name for the next possible item
+			FString Str1 = "PMC_Cs01" + It.Key().ToString() + FString::FromInt(1);
+			//Convert the FString to FName
+			FName InitialName1 = (*Str1);
+			UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName1);
+			NewComp->RegisterComponent();
+			NewComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+			NewComp->bUseAsyncCooking = true;
+			CreateSectionNode(false,nTriangleNormal);
+			//mesh->ClearAllMeshSections();
+			//mesh->ClearNeedEndOfFrameUpdate();
+			NewComp->CreateMeshSection_LinearColor(0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+			// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
+			// else mesh->SetMaterial(0, Material0);
+			NewComp->ContainsPhysicsTriMeshData(true); //Enable collision data
+			//mesh->bUseComplexAsSimpleCollision = false;
+			//mesh->AddCollisionConvexMesh(vertices);
+			NewComp->SetMobility(EComponentMobility::Static);
+			NewComp->SetEnableGravity(false);
+			ProceduralMeshes.Add(NewComp);
+		}
+		if (It.Value().ArrayData.Num() == 2)
+		{
+			for(int i = 0; i < It.Value().ArrayData.Num()-1; i++)
+			{
 				ClearProceduralElements();
-				vertices.Push(It.Value().ArrayData[0].PointStart_L);
-				vertices.Push(It.Value().ArrayData[0].PointStart_Lw);
-				vertices.Push(It.Value().ArrayData[It.Value().ArrayData.Num()-1].PointStart_Rw);
-				vertices.Push(It.Value().ArrayData[It.Value().ArrayData.Num()-1].PointStart_R);
+				
+				vertices.Push(It.Value().ArrayData[i].PointStart_R);
+				vertices.Push(It.Value().ArrayData[i].PointStart_Rw);
+				vertices.Push(It.Value().ArrayData[i+1].PointStart_Lw);
+				vertices.Push(It.Value().ArrayData[i+1].PointStart_L);
+				
 				nTriangleNormal.Empty();
-				nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[0].PointStart_R,It.Value().ThisMainPosition, 1), 3);
+				nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[i].PointStart_L,It.Value().ArrayData[i].PointStart_R,It.Value().ThisMainPosition, 1), 3);
 				//______________________________________________________________________________________________________
-				bX_target = UBFL_MathGraph::FindFocusVecToVecByX(It.Value().ArrayData[It.Value().ArrayData.Num()-1].route_relatively_node);
-				bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[It.Value().ArrayData.Num()-1].route_relatively_node);
+				bX_target = UBFL_MathGraph::FindFocusVecToVecByX(It.Value().ArrayData[i].route_relatively_node);
+				bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[i].route_relatively_node);
 				//______________________________________________________________________________________________________
 				//Change the name for the next possible item
-				FString Str1 = "PMC_Cs01" + It.Key().ToString() + FString::FromInt(1);
+				FString Str1 = "PMC_Cs2" + It.Key().ToString() + FString::FromInt(i);
 				//Convert the FString to FName
 				FName InitialName1 = (*Str1);
 				UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName1);
@@ -575,22 +614,21 @@ void AAGraphCoreElement::CreateProceduralSections()
 				NewComp->SetMobility(EComponentMobility::Static);
 				NewComp->SetEnableGravity(false);
 				ProceduralMeshes.Add(NewComp);
-		}
-		if (It.Value().ArrayData.Num() == 1)
-		{
+			}
+			//__________________________________________________________________________________________________________
 			ClearProceduralElements();
-			vertices.Push(It.Value().ArrayData[0].PointStart_R);
-			vertices.Push(It.Value().ArrayData[0].PointStart_Rw);
-			vertices.Push(It.Value().ArrayData[0].PointStart_Lw);
 			vertices.Push(It.Value().ArrayData[0].PointStart_L);
+			vertices.Push(It.Value().ArrayData[0].PointStart_Lw);
+			vertices.Push(It.Value().ArrayData[It.Value().ArrayData.Num()-1].PointStart_Rw);
+			vertices.Push(It.Value().ArrayData[It.Value().ArrayData.Num()-1].PointStart_R);
 			nTriangleNormal.Empty();
 			nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[0].PointStart_R,It.Value().ThisMainPosition, 1), 3);
-			//________________________________________________________________________________________________________
-			bX_target = UBFL_MathGraph::FindFocusVecToVecByX(It.Value().ArrayData[0].route_relatively_node);
-			bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[0].route_relatively_node);
-			//________________________________________________________________________________________________________
+			//__________________________________________________________________________________________________________
+			bX_target = UBFL_MathGraph::FindFocusVecToVecByX(It.Value().ArrayData[It.Value().ArrayData.Num()-1].route_relatively_node);
+			bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[It.Value().ArrayData.Num()-1].route_relatively_node);
+			//__________________________________________________________________________________________________________
 			//Change the name for the next possible item
-			FString Str1 = "PMC_Cs0" + It.Key().ToString() + FString::FromInt(1);
+			FString Str1 = "PMC_Cs02" + It.Key().ToString() + FString::FromInt(1);
 			//Convert the FString to FName
 			FName InitialName1 = (*Str1);
 			UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName1);
@@ -609,6 +647,77 @@ void AAGraphCoreElement::CreateProceduralSections()
 			NewComp->SetMobility(EComponentMobility::Static);
 			NewComp->SetEnableGravity(false);
 			ProceduralMeshes.Add(NewComp);
+		}
+		if (It.Value().ArrayData.Num() == 1)
+		{
+			if (It.Value().ArrayData[0].bOrientationConnectNode)
+			{
+				ClearProceduralElements();
+				vertices.Push(It.Value().ArrayData[0].PointStart_R);
+				vertices.Push(It.Value().ArrayData[0].PointStart_Rw);
+				vertices.Push(It.Value().ArrayData[0].PointStart_Lw);
+				vertices.Push(It.Value().ArrayData[0].PointStart_L);
+				nTriangleNormal.Empty();
+				nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[0].PointStart_R,It.Value().ThisMainPosition, 1), 3);
+				//________________________________________________________________________________________________________
+				bX_target = UBFL_MathGraph::FindFocusVecToVecByX(It.Value().ArrayData[0].route_relatively_node);
+				bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[0].route_relatively_node);
+				//________________________________________________________________________________________________________
+				//Change the name for the next possible item
+				FString Str1 = "PMC_Cs0" + It.Key().ToString() + FString::FromInt(1);
+				//Convert the FString to FName
+				FName InitialName1 = (*Str1);
+				UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName1);
+				NewComp->RegisterComponent();
+				NewComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+				NewComp->bUseAsyncCooking = true;
+				CreateSectionNode0(true,nTriangleNormal);
+				//mesh->ClearAllMeshSections();
+				//mesh->ClearNeedEndOfFrameUpdate();
+				NewComp->CreateMeshSection_LinearColor(0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
+				// else mesh->SetMaterial(0, Material0);
+				NewComp->ContainsPhysicsTriMeshData(true); //Enable collision data
+				//mesh->bUseComplexAsSimpleCollision = false;
+				//mesh->AddCollisionConvexMesh(vertices);
+				NewComp->SetMobility(EComponentMobility::Static);
+				NewComp->SetEnableGravity(false);
+				ProceduralMeshes.Add(NewComp);
+			}
+			else
+			{
+				ClearProceduralElements();
+				vertices.Push(It.Value().ArrayData[0].PointStart_R);
+				vertices.Push(It.Value().ArrayData[0].PointStart_Rw);
+				vertices.Push(It.Value().ArrayData[0].PointStart_Lw);
+				vertices.Push(It.Value().ArrayData[0].PointStart_L);
+				nTriangleNormal.Empty();
+				nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[0].PointStart_R,It.Value().ThisMainPosition, 1), 3);
+				//________________________________________________________________________________________________________
+				bX_target = UBFL_MathGraph::FindFocusVecToVecByX(It.Value().ArrayData[0].route_relatively_node);
+				bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[0].route_relatively_node);
+				//________________________________________________________________________________________________________
+				//Change the name for the next possible item
+				FString Str1 = "PMC_Cs0" + It.Key().ToString() + FString::FromInt(1);
+				//Convert the FString to FName
+				FName InitialName1 = (*Str1);
+				UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName1);
+				NewComp->RegisterComponent();
+				NewComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+				NewComp->bUseAsyncCooking = true;
+				CreateSectionNode0(false,nTriangleNormal);
+				//mesh->ClearAllMeshSections();
+				//mesh->ClearNeedEndOfFrameUpdate();
+				NewComp->CreateMeshSection_LinearColor(0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
+				// else mesh->SetMaterial(0, Material0);
+				NewComp->ContainsPhysicsTriMeshData(true); //Enable collision data
+				//mesh->bUseComplexAsSimpleCollision = false;
+				//mesh->AddCollisionConvexMesh(vertices);
+				NewComp->SetMobility(EComponentMobility::Static);
+				NewComp->SetEnableGravity(false);
+				ProceduralMeshes.Add(NewComp);
+			}
 		}
 	}
 }
@@ -868,73 +977,71 @@ void AAGraphCoreElement::CreateSectionWall(bool bReverseTriangle,TArray<FVector>
 	//creating triangles from these indices. Each iteration is a new triangle.
 	while ((i + 3) <= indices.size())
 	{
-		if (FMath::Abs(Xrange) > FMath::Abs(Yrange))
+		if (bReverseTriangle)//rigth
 		{
-			if (bX_target)
+			if (FMath::Abs(Xrange) > FMath::Abs(Yrange))
 			{
-				if (!bReverseTriangle)
+				if (bX_target)
 				{
-					Triangles.Add((uint32_t)indices[i+2]); //assuming that the first triangle starts from 0
+					Triangles.Add((uint32_t)indices[i]); 
 					Triangles.Add((uint32_t)indices[i+1]);
-					Triangles.Add((uint32_t)indices[i]);
+					Triangles.Add((uint32_t)indices[i+2]);
 				}
 				else
 				{
-					Triangles.Add((uint32_t)indices[i]); //assuming that the first triangle starts from 0
+					Triangles.Add((uint32_t)indices[i+2]); 
 					Triangles.Add((uint32_t)indices[i+1]);
-					Triangles.Add((uint32_t)indices[i+2]);
+					Triangles.Add((uint32_t)indices[i]);
 				}
 			}
 			else
 			{
-				if (!bReverseTriangle)
+				if (bY_target)
 				{
-					Triangles.Add((uint32_t)indices[i]); //assuming that the first triangle starts from 0
+					Triangles.Add((uint32_t)indices[i]); 
 					Triangles.Add((uint32_t)indices[i+1]);
 					Triangles.Add((uint32_t)indices[i+2]);
 				}
 				else
 				{
-					Triangles.Add((uint32_t)indices[i+2]); //assuming that the first triangle starts from 0
+					Triangles.Add((uint32_t)indices[i+2]); 
 					Triangles.Add((uint32_t)indices[i+1]);
 					Triangles.Add((uint32_t)indices[i]);
 				}
 			}
-			
 		}
 		else
 		{
-			if (bX_target)
+			if (FMath::Abs(Xrange) > FMath::Abs(Yrange))
 			{
-				if (!bReverseTriangle)
+				if (bX_target)
 				{
-					Triangles.Add((uint32_t)indices[i+2]); //assuming that the first triangle starts from 0
+					Triangles.Add((uint32_t)indices[i+2]); 
 					Triangles.Add((uint32_t)indices[i+1]);
 					Triangles.Add((uint32_t)indices[i]);
 				}
 				else
 				{
-					Triangles.Add((uint32_t)indices[i]); //assuming that the first triangle starts from 0
+					Triangles.Add((uint32_t)indices[i]); 
 					Triangles.Add((uint32_t)indices[i+1]);
 					Triangles.Add((uint32_t)indices[i+2]);
 				}
 			}
 			else
 			{
-				if (!bReverseTriangle)
+				if (bY_target)
 				{
-					Triangles.Add((uint32_t)indices[i]); //assuming that the first triangle starts from 0
-					Triangles.Add((uint32_t)indices[i+1]);
-					Triangles.Add((uint32_t)indices[i+2]);
-				}
-				else
-				{
-					Triangles.Add((uint32_t)indices[i+2]); //assuming that the first triangle starts from 0
+					Triangles.Add((uint32_t)indices[i+2]); 
 					Triangles.Add((uint32_t)indices[i+1]);
 					Triangles.Add((uint32_t)indices[i]);
 				}
+				else
+				{
+					Triangles.Add((uint32_t)indices[i]); 
+					Triangles.Add((uint32_t)indices[i+1]);
+					Triangles.Add((uint32_t)indices[i+2]);
+				}
 			}
-			
 		}
 		normals.Append(nTN);
 		tangents.Append(eachTriangleTangents);
@@ -1023,34 +1130,169 @@ void AAGraphCoreElement::CreateSectionNode(bool bReverseTriangle,TArray<FVector>
 	//creating triangles from these indices. Each iteration is a new triangle.
 	while ((i + 3) <= indices.size())
 	{
-		if (FMath::Abs(Xrange) > FMath::Abs(Yrange))
+		if (bReverseTriangle)
 		{
-			if (!bX_target)
+			Triangles.Add((uint32_t)indices[i+2]); 
+			Triangles.Add((uint32_t)indices[i+1]);
+			Triangles.Add((uint32_t)indices[i]);
+		}
+		else
+		{
+			Triangles.Add((uint32_t)indices[i]); 
+			Triangles.Add((uint32_t)indices[i+1]);
+			Triangles.Add((uint32_t)indices[i+2]);
+		}
+		normals.Append(nTN);
+		tangents.Append(eachTriangleTangents);
+		vertexColors.Append(eachTriangleVertexColors);
+		i += 3;
+	}
+		/*
+	UV mapping calculation - We need to map the 2D texture surface to the 2D junction surface.
+	We need to find the Xmax, Xmin, Ymax and Ymin of the polygon. Then we calculate Xrange and Yrange of the polygon.
+	After normalizing the coordinates of the vertices over this range, we can make the polygon fit over the 2D texture.
+	*/
+	if (FMath::Abs(Xrange) > FMath::Abs(Yrange))
+	{
+		float minimumX = FMath::Min(vertexXCoordinates);
+		float minimumY = FMath::Min(vertexYCoordinates);
+		float minimumZ = FMath::Min(vertexZCoordinates);
+		for (int32 i1 = 0; i1 < vertices.Num(); i1++) {
+			float X = (vertices[i1].X - minimumX) / 50.0f;
+			float Y = (vertices[i1].Z - minimumZ) / 50.0f;
+			UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX X COORDINATE IS %d -=-=-=-="), X);
+			UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX Y COORDINATE IS %d -=-=-=-="), Y);
+			UV0.Add(FVector2D(X, Y));
+		}
+	}
+	else
+	{
+		float minimumX = FMath::Min(vertexXCoordinates);
+		float minimumY = FMath::Min(vertexYCoordinates);
+		float minimumZ = FMath::Min(vertexZCoordinates);
+		for (int32 i1 = 0; i1 < vertices.Num(); i1++) {
+			float X = (vertices[i1].Y - minimumY) / 50.0f;
+			float Y = (vertices[i1].Z - minimumZ) / 50.0f;
+			UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX X COORDINATE IS %d -=-=-=-="), X);
+			UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX Y COORDINATE IS %d -=-=-=-="), Y);
+			UV0.Add(FVector2D(X, Y));
+		}
+	}
+	vertexXCoordinates.Empty();
+	vertexYCoordinates.Empty();
+	vertexZCoordinates.Empty();
+}
+
+void AAGraphCoreElement::CreateSectionNode0(bool bReverseTriangle,TArray<FVector> nTN)
+{
+	TArray<float> vertexXCoordinates;
+	vertexXCoordinates.Empty();
+	TArray<float> vertexYCoordinates;
+	vertexYCoordinates.Empty();
+	TArray<float> vertexZCoordinates;
+	vertexZCoordinates.Empty();
+	polygonVertices.clear();
+	polygon.clear();
+	for (int i = 0; i < vertices.Num(); i++)
+	{
+		vertexXCoordinates.Add(vertices[i].X);
+		vertexYCoordinates.Add(vertices[i].Y);
+		vertexZCoordinates.Add(vertices[i].Z);
+	}
+	float Xrange = FMath::Max(vertexXCoordinates) - FMath::Min(vertexXCoordinates);
+	float Yrange = FMath::Max(vertexYCoordinates) - FMath::Min(vertexYCoordinates);
+	float Zrange = FMath::Max(vertexZCoordinates) - FMath::Min(vertexZCoordinates);
+	if (FMath::Abs(Xrange) > FMath::Abs(Yrange))
+	{
+		for (int i = 0; i < vertices.Num(); i++)
+		{
+			Point vertex;
+			vertex[0] = vertices[i].X;
+			vertex[1] = vertices[i].Z;
+			polygonVertices.push_back(vertex);
+		}
+	}
+	else
+	{
+		for (int i = 0; i < vertices.Num(); i++)
+		{
+			Point vertex;
+			vertex[0] = vertices[i].Y;
+			vertex[1] = vertices[i].Z;
+			polygonVertices.push_back(vertex);
+		}
+	}
+	polygon.push_back(polygonVertices);
+	std::vector<N> indices = mapbox::earcut<N>(polygon);
+	//3 consecutive indices in clockwise order of the vertices of the input polygon.
+	int i = 0;
+	//creating triangles from these indices. Each iteration is a new triangle.
+	while ((i + 3) <= indices.size())
+	{
+		if (bReverseTriangle)
+		{
+			if (FMath::Abs(Xrange) > FMath::Abs(Yrange))
 			{
-				Triangles.Add((uint32_t)indices[i+2]); //assuming that the first triangle starts from 0
-				Triangles.Add((uint32_t)indices[i+1]);
-				Triangles.Add((uint32_t)indices[i]);
+				if (bY_target)
+				{
+					Triangles.Add((uint32_t)indices[i]); 
+					Triangles.Add((uint32_t)indices[i+1]);
+					Triangles.Add((uint32_t)indices[i+2]);
+				}
+				else
+				{
+					Triangles.Add((uint32_t)indices[i+2]); 
+					Triangles.Add((uint32_t)indices[i+1]);
+					Triangles.Add((uint32_t)indices[i]);
+				}
 			}
 			else
 			{
-				Triangles.Add((uint32_t)indices[i]); //assuming that the first triangle starts from 0
-				Triangles.Add((uint32_t)indices[i+1]);
-				Triangles.Add((uint32_t)indices[i+2]);
+				if (bX_target)
+				{
+					Triangles.Add((uint32_t)indices[i+2]); 
+					Triangles.Add((uint32_t)indices[i+1]);
+					Triangles.Add((uint32_t)indices[i]);
+				}
+				else
+				{
+					Triangles.Add((uint32_t)indices[i]); 
+					Triangles.Add((uint32_t)indices[i+1]);
+					Triangles.Add((uint32_t)indices[i+2]);
+				}
 			}
 		}
 		else
 		{
-			if (bY_target)
+			if (FMath::Abs(Xrange) > FMath::Abs(Yrange))
 			{
-				Triangles.Add((uint32_t)indices[i]); //assuming that the first triangle starts from 0
-				Triangles.Add((uint32_t)indices[i+1]);
-				Triangles.Add((uint32_t)indices[i+2]);
+				if (bY_target)
+				{
+					Triangles.Add((uint32_t)indices[i]); 
+					Triangles.Add((uint32_t)indices[i+1]);
+					Triangles.Add((uint32_t)indices[i+2]);
+				}
+				else
+				{
+					Triangles.Add((uint32_t)indices[i+2]); 
+					Triangles.Add((uint32_t)indices[i+1]);
+					Triangles.Add((uint32_t)indices[i]);
+				}
 			}
 			else
 			{
-				Triangles.Add((uint32_t)indices[i+2]); //assuming that the first triangle starts from 0
-				Triangles.Add((uint32_t)indices[i+1]);
-				Triangles.Add((uint32_t)indices[i]);
+				if (bX_target)
+				{
+					Triangles.Add((uint32_t)indices[i+2]); 
+					Triangles.Add((uint32_t)indices[i+1]);
+					Triangles.Add((uint32_t)indices[i]);
+				}
+				else
+				{
+					Triangles.Add((uint32_t)indices[i]); 
+					Triangles.Add((uint32_t)indices[i+1]);
+					Triangles.Add((uint32_t)indices[i+2]);
+				}
 			}
 		}
 		normals.Append(nTN);
@@ -1093,6 +1335,7 @@ void AAGraphCoreElement::CreateSectionNode(bool bReverseTriangle,TArray<FVector>
 	vertexYCoordinates.Empty();
 	vertexZCoordinates.Empty();
 }
+
 void AAGraphCoreElement::ClearAllBuilding()
 {
 	for (auto It = StaticMeshes.CreateIterator(); It; It++)
