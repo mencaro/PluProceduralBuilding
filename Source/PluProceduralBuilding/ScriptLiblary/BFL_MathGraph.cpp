@@ -28,3 +28,8 @@ bool UBFL_MathGraph::FindFocusVecToVecByY(FVector n1)
 		return false;
 }
 
+float UBFL_MathGraph::FindAngleByVector(FVector n1, FVector n2)
+{
+	return acos(n1.DotProduct(n1,n2));
+}
+

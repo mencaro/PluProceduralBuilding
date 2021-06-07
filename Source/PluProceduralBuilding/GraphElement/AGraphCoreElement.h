@@ -87,6 +87,7 @@ protected:
 	void ClearProceduralElements();
 	void AddVertexFloor();
 	void GraphRebuildNodeSpace();
+	UProceduralMeshComponent* CreateProceduralElements(FString NameElementsPrefix,FString NameElements);
 	FVector SetNormalToFloor(FVector a,FVector b,FVector c, int i);
 public:
 	// Called every frame
