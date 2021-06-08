@@ -40,9 +40,6 @@ void AA_Graph_Node_Base::IAddNode_Implementation(AActor* node, bool bTypeConnect
 {
 	FConnectionType ct;
 	ct.bOrientationConnectNode = bTypeConnect;
-	// ct.bConnectionSearch = true;
-	// ct.wightBranch = wigth;
-	// ct.AddConnectNode(node);
 }
 void AA_Graph_Node_Base::IAddBranch_Implementation(AActor* br)
 {
@@ -52,7 +49,7 @@ FArrayConnectionType AA_Graph_Node_Base::IGetConnectionNode_Implementation()
 {
 	ConnectionNodes.ThisMainPosition = this->GetActorLocation();
 	ConnectionNodes.ThisMainPositionW = this->GetActorLocation();
-	ConnectionNodes.ThisMainPositionW.Z = ConnectionNodes.ThisMainPositionW.Z + 150;
+	ConnectionNodes.ThisMainPositionW.Z = ConnectionNodes.ThisMainPositionW.Z + HeightRange;
 	ConnectionNodes.pointOnThis = this;
 	return ConnectionNodes;
 }
@@ -64,7 +61,7 @@ void AA_Graph_Node_Base::ISetConnectionNode_Implementation(TArray<FConnectionTyp
 
 int AA_Graph_Node_Base::IGetRangeOuts_Implementation()
 {
-	return rangeOuts;
+	return 0;
 }
 
 void AA_Graph_Node_Base::IGraphRebuildNodeSpace_Implementation()

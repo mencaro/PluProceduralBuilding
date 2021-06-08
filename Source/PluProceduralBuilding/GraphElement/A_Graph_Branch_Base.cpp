@@ -67,8 +67,8 @@ void AA_Graph_Branch_Base::CreateSplineAndPoint()
 		FVector routeBranchNorm = routeBranch.CrossProduct(routeBranch, FVector(0,0,1));
 		GLog->Log(routeBranch.ToString());
 		//
-		FVector n1 = Node1->GetActorLocation() + routeBranch * II_NodeGraph::Execute_IGetRangeOuts(Node1);
-		FVector n2 = Node2->GetActorLocation() + (routeBranch * (-1)) * II_NodeGraph::Execute_IGetRangeOuts(Node2);
+		FVector n1 = Node1->GetActorLocation() + routeBranch ;//* II_NodeGraph::Execute_IGetRangeOuts(Node1);
+		FVector n2 = Node2->GetActorLocation() + (routeBranch * (-1));// * II_NodeGraph::Execute_IGetRangeOuts(Node2);
 		AddStartEndDataToBranch(splineMid,n1,n2);
 		//
 		point1_rigth = n1 + routeBranchNorm * wigthBranch_n1;

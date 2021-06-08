@@ -16,7 +16,7 @@ USTRUCT(BlueprintType)
 struct FConnectionType
 {
 	GENERATED_BODY()
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bOrientationConnectNode;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int wightBranch;
@@ -42,7 +42,7 @@ struct FConnectionType
 	FConnectionType()
 	{
 		bOrientationConnectNode = true;
-		wightBranch = 40;
+		wightBranch = 200;
 		angle_route = 0;
 		
 	}
@@ -67,11 +67,14 @@ struct FArrayConnectionType
 	AActor* pointOnThis;
 	///значение расширения узла - удаления входа веток от центра
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int RangeOuts;
+		int RangeOuts;
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int HeightRange;*/
 	double angle0;
 	FArrayConnectionType()
 	{
-		RangeOuts = 150;
+		RangeOuts = 200;
+		//HeightRange = 200;
 		angle0 = -10000.0;
 		pointOnThis = nullptr;
 	}

@@ -88,6 +88,7 @@ protected:
 	void AddVertexFloor();
 	void GraphRebuildNodeSpace();
 	UProceduralMeshComponent* CreateProceduralElements(FString NameElementsPrefix,FString NameElements);
+	void FillingProceduralElements(UProceduralMeshComponent* PC, int Id_section, TArray<FVector> V, TArray<int32> Tr, TArray<FVector> N, TArray<FVector2D> UV, TArray<FLinearColor> LC,TArray<FProcMeshTangent> PMT, bool CollisionEnable);
 	FVector SetNormalToFloor(FVector a,FVector b,FVector c, int i);
 public:
 	// Called every frame

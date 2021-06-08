@@ -31,8 +31,8 @@ protected:
 	TArray<USplineComponent*> ausc;
 	TArray<USplineComponent*>Splines_;
 	///значение расширения узла - удаления входа веток от центра
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-		int rangeOuts;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int HeightRange = 200;
 	///добавление узла связи в графе
 	void IAddNode_Implementation(AActor* node, bool bTypeConnect, int wigth) override;
 	void IAddBranch_Implementation(AActor* br) override;
