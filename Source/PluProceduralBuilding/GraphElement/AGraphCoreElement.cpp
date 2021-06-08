@@ -40,7 +40,7 @@ void AAGraphCoreElement::OnConstruction(const FTransform& Transform)
 
 void AAGraphCoreElement::CreateProceduralSections()
 {
-	float g1 = 2.69; float g2 = 3.2;
+	float g1 = 2.05; float g2 = 3.2;
 	//ветки
 	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
 	{
@@ -259,15 +259,17 @@ void AAGraphCoreElement::CreateProceduralSections()
 				UE_LOG(LogTemp, Warning, TEXT("МЕЖДУ ЛИНИЯМИ: %f"), a);
 				if ((a > g1) && (a <g2))
 				{
-					for(int i = 0; i < It.Value().ArrayData.Num(); i++)
+					//for(int i = 0; i < It.Value().ArrayData.Num(); i++)
 					{
-						vertices.Push(It.Value().ArrayData[i].PointStart_Lw);
-						vertices.Push(It.Value().ArrayData[i].PointStart_Rw);
+						vertices.Push(It.Value().ArrayData[0].PointStart_Lw);
+						vertices.Push(It.Value().ArrayData[0].PointStart_Rw);
+						vertices.Push(It.Value().ArrayData[1].PointStart_Lw);
+						vertices.Push(It.Value().ArrayData[1].PointStart_Rw);
 					}
 					nTriangleNormal.Empty();
-					nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_Lw,It.Value().ArrayData[0].PointStart_Rw,It.Value().ThisMainPositionW, -1), 3);
+					nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[0].PointStart_R,It.Value().ThisMainPosition, 1), 3);
 					//Change the name for the next possible item
-					FString Str1 = "PMC_C_rg1" + It.Key().ToString() + FString::FromInt(1);
+					FString Str1 = "PMC_C" + It.Key().ToString() + FString::FromInt(1);
 					//Convert the FString to FName
 					FName InitialName1 = (*Str1);
 					UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName1);
@@ -292,24 +294,23 @@ void AAGraphCoreElement::CreateProceduralSections()
 					FVector n_vec;
 					if (n_vec.DotProduct(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[1].route_relatively_node) < 0)
 					{
-						vertices.Push(It.Value().ArrayData[0].PointStart_L);
-						vertices.Push(It.Value().ArrayData[0].PointStart_R);
-						vertices.Push(It.Value().ArrayData[1].PointStart_L);
-						vertices.Push(It.Value().ArrayData[1].PointStart_R);
-						vertices.Push(It.Value().ThisMainPosition);
+						vertices.Push(It.Value().ArrayData[0].PointStart_Lw);
+						vertices.Push(It.Value().ArrayData[0].PointStart_Rw);
+						vertices.Push(It.Value().ArrayData[1].PointStart_Lw);
+						vertices.Push(It.Value().ArrayData[1].PointStart_Rw);
+						vertices.Push(It.Value().ThisMainPositionW);
 					}
 					else
 					{
-						vertices.Push(It.Value().ArrayData[0].PointStart_L);
-						vertices.Push(It.Value().ArrayData[0].PointStart_R);
-						vertices.Push(It.Value().ThisMainPosition);
-						vertices.Push(It.Value().ArrayData[1].PointStart_L);
-						vertices.Push(It.Value().ArrayData[1].PointStart_R);
+						vertices.Push(It.Value().ArrayData[0].PointStart_Lw);
+						vertices.Push(It.Value().ArrayData[0].PointStart_Rw);
+						vertices.Push(It.Value().ThisMainPositionW);
+						vertices.Push(It.Value().ArrayData[1].PointStart_Lw);
+						vertices.Push(It.Value().ArrayData[1].PointStart_Rw);
 					}
 					nTriangleNormal.Empty();
-					nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_Lw,It.Value().ArrayData[0].PointStart_Rw,It.Value().ThisMainPositionW, -1), 3);
-					//Change the name for the next possible item
-					FString Str1 = "PMC_C_rg2" + It.Key().ToString() + FString::FromInt(1);
+					nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[0].PointStart_R,It.Value().ThisMainPosition, 1), 3);
+					FString Str1 = "PMC_C" + It.Key().ToString() + FString::FromInt(1);
 					//Convert the FString to FName
 					FName InitialName1 = (*Str1);
 					UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName1);
@@ -332,26 +333,27 @@ void AAGraphCoreElement::CreateProceduralSections()
 				else if ((a < g1))
 				{
 					FVector n_vec;
-					if (n_vec.DotProduct(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[1].route_relatively_node) > 0)
-					{
-						vertices.Push(It.Value().ArrayData[0].PointStart_L);
-						vertices.Push(It.Value().ArrayData[0].PointStart_R);
-						vertices.Push(It.Value().ArrayData[1].PointStart_L);
-						vertices.Push(It.Value().ArrayData[1].PointStart_R);
-						vertices.Push(It.Value().ThisMainPosition);
-					}
+                    //________________________________________________________________________________________________________
+                    if (n_vec.DotProduct(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[1].route_relatively_node) > 0)
+                    {
+                    	vertices.Push(It.Value().ArrayData[0].PointStart_Lw);
+                    	vertices.Push(It.Value().ArrayData[0].PointStart_Rw);
+                    	vertices.Push(It.Value().ArrayData[1].PointStart_Lw);
+                    	vertices.Push(It.Value().ArrayData[1].PointStart_Rw);
+                    	vertices.Push(It.Value().ThisMainPositionW);
+                    }
 					else
 					{
-						vertices.Push(It.Value().ArrayData[0].PointStart_L);
-						vertices.Push(It.Value().ArrayData[0].PointStart_R);
-						vertices.Push(It.Value().ThisMainPosition);
-						vertices.Push(It.Value().ArrayData[1].PointStart_L);
-						vertices.Push(It.Value().ArrayData[1].PointStart_R);
+						vertices.Push(It.Value().ArrayData[0].PointStart_Lw);
+						vertices.Push(It.Value().ArrayData[0].PointStart_Rw);
+						vertices.Push(It.Value().ThisMainPositionW);
+						vertices.Push(It.Value().ArrayData[1].PointStart_Lw);
+						vertices.Push(It.Value().ArrayData[1].PointStart_Rw);
 					}
 					nTriangleNormal.Empty();
-					nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_Lw,It.Value().ArrayData[0].PointStart_Rw,It.Value().ThisMainPositionW, -1), 3);
+					nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[0].PointStart_R,It.Value().ThisMainPosition, 1), 3);
 					//Change the name for the next possible item
-					FString Str1 = "PMC_C_rg3" + It.Key().ToString() + FString::FromInt(1);
+					FString Str1 = "PMC_C" + It.Key().ToString() + FString::FromInt(1);
 					//Convert the FString to FName
 					FName InitialName1 = (*Str1);
 					UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName1);
@@ -380,9 +382,9 @@ void AAGraphCoreElement::CreateProceduralSections()
 					vertices.Push(It.Value().ArrayData[i].PointStart_Rw);
 				}
 				nTriangleNormal.Empty();
-				nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_Lw,It.Value().ArrayData[0].PointStart_Rw,It.Value().ThisMainPositionW, -1), 3);
+				nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[0].PointStart_R,It.Value().ThisMainPosition, 1), 3);
 				//Change the name for the next possible item
-				FString Str1 = "PMC_C_rg4" + It.Key().ToString() + FString::FromInt(1);
+				FString Str1 = "PMC_C" + It.Key().ToString() + FString::FromInt(1);
 				//Convert the FString to FName
 				FName InitialName1 = (*Str1);
 				UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName1);
@@ -644,6 +646,30 @@ void AAGraphCoreElement::CreateProceduralSections()
 					NewComp->SetEnableGravity(false);
 					ProceduralMeshes.Add(NewComp);
 				}
+				//__________________________________________________________________________________________________________
+				ClearProceduralElements();
+				vertices.Push(It.Value().ArrayData[0].PointStart_L);
+				vertices.Push(It.Value().ArrayData[0].PointStart_Lw);
+				vertices.Push(It.Value().ArrayData[It.Value().ArrayData.Num()-1].PointStart_Rw);
+				vertices.Push(It.Value().ArrayData[It.Value().ArrayData.Num()-1].PointStart_R);
+				nTriangleNormal.Empty();
+				nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[0].PointStart_R,It.Value().ThisMainPosition, 1), 3);
+				//__________________________________________________________________________________________________________
+				bX_target = UBFL_MathGraph::FindFocusVecToVecByX(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[It.Value().ArrayData.Num()-1].PointStart_L);
+				bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[It.Value().ArrayData.Num()-1].PointStart_L);
+				//__________________________________________________________________________________________________________
+				CreateSectionWall(false,nTriangleNormal);
+				//mesh->ClearAllMeshSections();
+				//mesh->ClearNeedEndOfFrameUpdate();
+				NewComp->CreateMeshSection_LinearColor(It.Value().ArrayData.Num(), vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
+				// else mesh->SetMaterial(0, Material0);
+				NewComp->ContainsPhysicsTriMeshData(true); //Enable collision data
+				//mesh->bUseComplexAsSimpleCollision = false;
+				//mesh->AddCollisionConvexMesh(vertices);
+				NewComp->SetMobility(EComponentMobility::Static);
+				NewComp->SetEnableGravity(false);
+				ProceduralMeshes.Add(NewComp);
 			}
 			else if ((a > g2))
 			{
@@ -663,10 +689,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 				{
 					vertices.Push(It.Value().ArrayData[0].PointStart_R);
 					vertices.Push(It.Value().ArrayData[0].PointStart_Rw);
-					vertices.Push(It.Value().ThisMainPositionW);
 					vertices.Push(It.Value().ArrayData[1].PointStart_Lw);
 					vertices.Push(It.Value().ArrayData[1].PointStart_L);
-					vertices.Push(It.Value().ThisMainPosition);
 				}
 				//
 				nTriangleNormal.Empty();
@@ -679,6 +703,43 @@ void AAGraphCoreElement::CreateProceduralSections()
 				//mesh->ClearAllMeshSections();
 				//mesh->ClearNeedEndOfFrameUpdate();
 				NewComp->CreateMeshSection_LinearColor(0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
+				// else mesh->SetMaterial(0, Material0);
+				NewComp->ContainsPhysicsTriMeshData(true); //Enable collision data
+				//mesh->bUseComplexAsSimpleCollision = false;
+				//mesh->AddCollisionConvexMesh(vertices);
+				NewComp->SetMobility(EComponentMobility::Static);
+				NewComp->SetEnableGravity(false);
+				ProceduralMeshes.Add(NewComp);
+				//++
+				ClearProceduralElements();
+				if (n_vec.DotProduct(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[1].route_relatively_node) > 0)
+				{
+					vertices.Push(It.Value().ArrayData[1].PointStart_R);
+					vertices.Push(It.Value().ArrayData[1].PointStart_Rw);
+					vertices.Push(It.Value().ThisMainPositionW);
+					vertices.Push(It.Value().ArrayData[0].PointStart_Lw);
+					vertices.Push(It.Value().ArrayData[0].PointStart_L);
+					vertices.Push(It.Value().ThisMainPosition);
+				}
+				else
+				{
+					vertices.Push(It.Value().ArrayData[1].PointStart_R);
+					vertices.Push(It.Value().ArrayData[1].PointStart_Rw);
+					vertices.Push(It.Value().ArrayData[0].PointStart_Lw);
+					vertices.Push(It.Value().ArrayData[0].PointStart_L);
+				}
+				//
+				nTriangleNormal.Empty();
+				nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[0].PointStart_R,It.Value().ThisMainPosition, 1), 3);
+				//______________________________________________________________________________________________________
+				bX_target = UBFL_MathGraph::FindFocusVecToVecByX(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[1].PointStart_L);
+				bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[1].PointStart_L);
+				//______________________________________________________________________________________________________
+				CreateSectionWall(true,nTriangleNormal);
+				//mesh->ClearAllMeshSections();
+				//mesh->ClearNeedEndOfFrameUpdate();
+				NewComp->CreateMeshSection_LinearColor(1, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
 				// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
 				// else mesh->SetMaterial(0, Material0);
 				NewComp->ContainsPhysicsTriMeshData(true); //Enable collision data
@@ -693,7 +754,7 @@ void AAGraphCoreElement::CreateProceduralSections()
 				ClearProceduralElements();
 				//
 				FVector n_vec;
-				if (n_vec.DotProduct(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[1].route_relatively_node) > 0)
+				if (n_vec.DotProduct(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[1].route_relatively_node) < 0)
 				{
 					vertices.Push(It.Value().ArrayData[0].PointStart_R);
 					vertices.Push(It.Value().ArrayData[0].PointStart_Rw);
@@ -706,10 +767,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 				{
 					vertices.Push(It.Value().ArrayData[0].PointStart_R);
 					vertices.Push(It.Value().ArrayData[0].PointStart_Rw);
-					vertices.Push(It.Value().ThisMainPositionW);
 					vertices.Push(It.Value().ArrayData[1].PointStart_Lw);
 					vertices.Push(It.Value().ArrayData[1].PointStart_L);
-					vertices.Push(It.Value().ThisMainPosition);
 				}
 				//
 				nTriangleNormal.Empty();
@@ -730,31 +789,46 @@ void AAGraphCoreElement::CreateProceduralSections()
 				NewComp->SetMobility(EComponentMobility::Static);
 				NewComp->SetEnableGravity(false);
 				ProceduralMeshes.Add(NewComp);
+				//++
+				ClearProceduralElements();
+				bool r = false;
+				if (n_vec.DotProduct(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[1].route_relatively_node) > 0)
+				{
+					r = true;
+					vertices.Push(It.Value().ArrayData[0].PointStart_L);
+					vertices.Push(It.Value().ArrayData[0].PointStart_Lw);
+					vertices.Push(It.Value().ThisMainPositionW);
+					vertices.Push(It.Value().ArrayData[1].PointStart_Rw);
+					vertices.Push(It.Value().ArrayData[1].PointStart_R);
+					vertices.Push(It.Value().ThisMainPosition);
+				}
+				else
+				{
+					vertices.Push(It.Value().ArrayData[1].PointStart_R);
+					vertices.Push(It.Value().ArrayData[1].PointStart_Rw);
+					vertices.Push(It.Value().ArrayData[0].PointStart_Lw);
+					vertices.Push(It.Value().ArrayData[0].PointStart_L);
+				}
+				//
+				nTriangleNormal.Empty();
+				nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[0].PointStart_R,It.Value().ThisMainPosition, 1), 3);
+				//______________________________________________________________________________________________________
+				bX_target = UBFL_MathGraph::FindFocusVecToVecByX(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[1].PointStart_L);
+				bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[1].PointStart_L);
+				//______________________________________________________________________________________________________
+				CreateSectionWall(r,nTriangleNormal);
+				//mesh->ClearAllMeshSections();
+				//mesh->ClearNeedEndOfFrameUpdate();
+				NewComp->CreateMeshSection_LinearColor(1, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
+				// else mesh->SetMaterial(0, Material0);
+				NewComp->ContainsPhysicsTriMeshData(true); //Enable collision data
+				//mesh->bUseComplexAsSimpleCollision = false;
+				//mesh->AddCollisionConvexMesh(vertices);
+				NewComp->SetMobility(EComponentMobility::Static);
+				NewComp->SetEnableGravity(false);
+				ProceduralMeshes.Add(NewComp);
 			}
-			//__________________________________________________________________________________________________________
-			ClearProceduralElements();
-			vertices.Push(It.Value().ArrayData[0].PointStart_L);
-			vertices.Push(It.Value().ArrayData[0].PointStart_Lw);
-			vertices.Push(It.Value().ArrayData[It.Value().ArrayData.Num()-1].PointStart_Rw);
-			vertices.Push(It.Value().ArrayData[It.Value().ArrayData.Num()-1].PointStart_R);
-			nTriangleNormal.Empty();
-			nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[0].PointStart_R,It.Value().ThisMainPosition, 1), 3);
-			//__________________________________________________________________________________________________________
-			bX_target = UBFL_MathGraph::FindFocusVecToVecByX(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[It.Value().ArrayData.Num()-1].PointStart_L);
-			bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[It.Value().ArrayData.Num()-1].PointStart_L);
-			//__________________________________________________________________________________________________________
-			CreateSectionWall(false,nTriangleNormal);
-			//mesh->ClearAllMeshSections();
-			//mesh->ClearNeedEndOfFrameUpdate();
-			NewComp->CreateMeshSection_LinearColor(It.Value().ArrayData.Num(), vertices, Triangles, normals, UV0, vertexColors, tangents, true);
-			// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
-			// else mesh->SetMaterial(0, Material0);
-			NewComp->ContainsPhysicsTriMeshData(true); //Enable collision data
-			//mesh->bUseComplexAsSimpleCollision = false;
-			//mesh->AddCollisionConvexMesh(vertices);
-			NewComp->SetMobility(EComponentMobility::Static);
-			NewComp->SetEnableGravity(false);
-			ProceduralMeshes.Add(NewComp);
 		}
 		if (It.Value().ArrayData.Num() == 1)
 		{
