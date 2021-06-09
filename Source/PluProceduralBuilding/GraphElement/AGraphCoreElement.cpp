@@ -524,7 +524,7 @@ void AAGraphCoreElement::CreateProceduralSections()
 				//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				ClearProceduralElements();
 				bool r = false;
-				if (n_vec.DotProduct(It.Value().ArrayData[1].PointStart_R - It.Value().ArrayData[1].PointStart_L,It.Value().ArrayData[0].route_relatively_node) > 0)
+				if (n_vec.DotProduct(It.Value().ArrayData[1].PointStart_R - It.Value().ArrayData[1].PointStart_L,It.Value().ArrayData[0].route_relatively_node) < 0)
 				{
 					//r = true;
 					vertices.Push(It.Value().ArrayData[0].PointStart_L);
@@ -1341,11 +1341,11 @@ void AAGraphCoreElement::SearchBranches()
 					{
 						It.Value().ArrayData[i].PointStart =
 							It.Value().ThisMainPosition +
-								It.Value().ArrayData[i].route_relatively_node * It.Value().RangeOuts;
+								It.Value().ArrayData[i].route_relatively_node * II_NodeGraph::Execute_IGetRangeOuts(It.Value().pointOnThis);// It.Value().RangeOuts;
 						//______________________________________________________________________________________________
 						It.Value().ArrayData[i].PointEnd =
 							 It.Value().ArrayData[i].aConnectionNode->GetActorLocation() +
-								(It.Value().ArrayData[i].route_relatively_node * (-1)) * It.Value().RangeOuts;
+								(It.Value().ArrayData[i].route_relatively_node * (-1)) * II_NodeGraph::Execute_IGetRangeOuts(It.Value().ArrayData[i].aConnectionNode);//It.Value().RangeOuts;
 						//______________________________________________________________________________________________
 						It.Value().ArrayData[i].PointStart_R =
 							It.Value().ArrayData[i].PointStart + It.Value().ArrayData[i].routeBranchNorm * It.Value().ArrayData[i].wightBranch;
@@ -1356,16 +1356,17 @@ void AAGraphCoreElement::SearchBranches()
 						It.Value().ArrayData[i].PointEnd_L =
                             It.Value().ArrayData[i].PointEnd + It.Value().ArrayData[i].routeBranchNorm * (-1) * It.Value().ArrayData[i].wightBranch;
 						//______________________________________________________________________________________________
-						float h = FMath::Abs( It.Value().ThisMainPositionW.Z - It.Value().ThisMainPosition.Z );
+						float h_start = II_NodeGraph::Execute_IGetHeightNode(It.Value().pointOnThis);// FMath::Abs( It.Value().ThisMainPositionW.Z - It.Value().ThisMainPosition.Z );
+						float h_end = II_NodeGraph::Execute_IGetHeightNode(It.Value().ArrayData[i].aConnectionNode);//FMath::Abs( It.Value().ThisMainPositionW.Z - It.Value().ThisMainPosition.Z );
 						//______________________________________________________________________________________________
 						It.Value().ArrayData[i].PointStart_Rw =It.Value().ArrayData[i].PointStart_R;
-						It.Value().ArrayData[i].PointStart_Rw.Z =It.Value().ArrayData[i].PointStart_R.Z + h;
+						It.Value().ArrayData[i].PointStart_Rw.Z =It.Value().ArrayData[i].PointStart_R.Z + h_start;
 						It.Value().ArrayData[i].PointEnd_Rw = It.Value().ArrayData[i].PointEnd_R;
-						It.Value().ArrayData[i].PointEnd_Rw.Z = It.Value().ArrayData[i].PointEnd_R.Z + h;
+						It.Value().ArrayData[i].PointEnd_Rw.Z = It.Value().ArrayData[i].PointEnd_R.Z + h_end;
 						It.Value().ArrayData[i].PointStart_Lw = It.Value().ArrayData[i].PointStart_L;
-						It.Value().ArrayData[i].PointStart_Lw.Z = It.Value().ArrayData[i].PointStart_L.Z + h;
+						It.Value().ArrayData[i].PointStart_Lw.Z = It.Value().ArrayData[i].PointStart_L.Z + h_start;
 						It.Value().ArrayData[i].PointEnd_Lw = It.Value().ArrayData[i].PointEnd_L;
-						It.Value().ArrayData[i].PointEnd_Lw.Z = It.Value().ArrayData[i].PointEnd_L.Z + h;
+						It.Value().ArrayData[i].PointEnd_Lw.Z = It.Value().ArrayData[i].PointEnd_L.Z + h_end;
 					}
 				}
 			}

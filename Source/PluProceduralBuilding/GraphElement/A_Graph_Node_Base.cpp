@@ -51,6 +51,7 @@ FArrayConnectionType AA_Graph_Node_Base::IGetConnectionNode_Implementation()
 	ConnectionNodes.ThisMainPositionW = this->GetActorLocation();
 	ConnectionNodes.ThisMainPositionW.Z = ConnectionNodes.ThisMainPositionW.Z + HeightRange;
 	ConnectionNodes.pointOnThis = this;
+	ConnectionNodes.RangeOuts = RangeNodeSpace;
 	return ConnectionNodes;
 }
 void AA_Graph_Node_Base::ISetConnectionNode_Implementation(TArray<FConnectionType>& ct)
@@ -61,9 +62,16 @@ void AA_Graph_Node_Base::ISetConnectionNode_Implementation(TArray<FConnectionTyp
 
 int AA_Graph_Node_Base::IGetRangeOuts_Implementation()
 {
-	return 0;
+	return RangeNodeSpace;
 }
-
+int AA_Graph_Node_Base::IGetHeightNode_Implementation()
+{
+	return HeightRange;
+}
+FVector AA_Graph_Node_Base::IGetNodePositionInTheWorld_Implementation()
+{
+	return this->GetActorLocation();
+}
 void AA_Graph_Node_Base::IGraphRebuildNodeSpace_Implementation()
 {
 	// if (ConnectionNodes.Num() > 0)

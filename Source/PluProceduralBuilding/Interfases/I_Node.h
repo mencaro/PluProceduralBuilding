@@ -24,4 +24,8 @@ class PLUPROCEDURALBUILDING_API II_NodeGraph
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
         int IGetRangeOuts();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
+		int IGetHeightNode();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
+		FVector IGetNodePositionInTheWorld();
 };

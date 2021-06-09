@@ -23,20 +23,23 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 	///список соединений узла с остальными узлами графа
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 		FArrayConnectionType ConnectionNodes;
 	TArray<AActor*> ConnectionBranch;
 	TArray<USplineComponent*> ausc;
-	TArray<USplineComponent*>Splines_;
-	///значение расширения узла - удаления входа веток от центра
+	TArray<USplineComponent*> Splines_;
+	///значение расширения узла - высота
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int HeightRange = 200;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int RangeNodeSpace = 200;
 	///добавление узла связи в графе
 	void IAddNode_Implementation(AActor* node, bool bTypeConnect, int wigth) override;
 	void IAddBranch_Implementation(AActor* br) override;
 	int IGetRangeOuts_Implementation() override;
+	int IGetHeightNode_Implementation() override;
+	FVector IGetNodePositionInTheWorld_Implementation() override;
 	///получить список соединений узла с элементами графа
 	FArrayConnectionType IGetConnectionNode_Implementation() override;
 	void ISetConnectionNode_Implementation(TArray<FConnectionType>& ct) override;
