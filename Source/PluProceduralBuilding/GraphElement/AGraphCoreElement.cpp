@@ -41,12 +41,14 @@ void AAGraphCoreElement::OnConstruction(const FTransform& Transform)
 void AAGraphCoreElement::CreateProceduralSections()
 {
 	float g1 = 2.05; float g2 = 3.2;
+	UProceduralMeshComponent* NewComp = CreateProceduralElements("MyPMC","");
+	int id_section = 0;
 	//ветки
 	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
 	{
 		if (It.Value().ArrayData.Num()>0)
 		{
-			UProceduralMeshComponent* NewComp = CreateProceduralElements("MyPMC",It.Key().ToString());
+			//UProceduralMeshComponent* NewComp = CreateProceduralElements("MyPMC",It.Key().ToString());
 			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
 			{
 				if(It.Value().ArrayData[i].bOrientationConnectNode)
@@ -62,7 +64,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 					nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[i].PointStart_L,It.Value().ArrayData[i].PointStart_R,It.Value().ArrayData[i].PointEnd_L, 1), 3);
 					CreateSection(false,nTriangleNormal);
 					//___________________________________________________
-					FillingProceduralElements(NewComp, i, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					id_section++;
 				}
 			}
 		}
@@ -70,7 +73,7 @@ void AAGraphCoreElement::CreateProceduralSections()
 	//узлы
 	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
 	{
-		UProceduralMeshComponent* NewComp = CreateProceduralElements("MyPMC1",It.Key().ToString());
+		//UProceduralMeshComponent* NewComp = CreateProceduralElements("MyPMC1",It.Key().ToString());
 		ClearProceduralElements();
 		if (It.Value().ArrayData.Num()>0)
 		{
@@ -92,7 +95,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 					nTriangleNormal.Empty();
 					nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[0].PointStart_R,It.Value().ThisMainPosition, 1), 3);
 					CreateSection(false,nTriangleNormal);
-					FillingProceduralElements(NewComp, 0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					id_section++;
 				}
 				else if ((a > g2))
 				{
@@ -117,7 +121,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 					nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[0].PointStart_R,It.Value().ThisMainPosition, 1), 3);
 					
 					CreateSection(false,nTriangleNormal);
-					FillingProceduralElements(NewComp, 0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					id_section++;
 				}
 				else if ((a < g1))
 				{
@@ -143,7 +148,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 					nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[0].PointStart_R,It.Value().ThisMainPosition, 1), 3);
 					
 					CreateSection(false,nTriangleNormal);
-					FillingProceduralElements(NewComp, 0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					id_section++;
 				}
 			}
 			else
@@ -157,14 +163,15 @@ void AAGraphCoreElement::CreateProceduralSections()
 				nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[0].PointStart_R,It.Value().ThisMainPosition, 1), 3);
 				
 				CreateSection(false,nTriangleNormal);
-				FillingProceduralElements(NewComp, 0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				id_section++;
 			}
 		}
 	}
 	//узлы крышка верх
 	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
 	{
-		UProceduralMeshComponent* NewComp = CreateProceduralElements("MyPMC2",It.Key().ToString());
+		//UProceduralMeshComponent* NewComp = CreateProceduralElements("MyPMC2",It.Key().ToString());
 		ClearProceduralElements();
 		if (It.Value().ArrayData.Num()>0)
 		{
@@ -187,7 +194,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 					nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[0].PointStart_R,It.Value().ThisMainPosition, 1), 3);
 					
 					CreateSection(true,nTriangleNormal);
-					FillingProceduralElements(NewComp, 0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					id_section++;
 				}
 				else if ((a > g2))
 				{
@@ -212,7 +220,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 					nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[0].PointStart_R,It.Value().ThisMainPosition, 1), 3);
 					
 					CreateSection(true,nTriangleNormal);
-					FillingProceduralElements(NewComp, 0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					id_section++;
 				}
 				else if ((a < g1))
 				{
@@ -238,7 +247,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 					nTriangleNormal.Init(SetNormalToFloor(It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[0].PointStart_R,It.Value().ThisMainPosition, 1), 3);
 					
 					CreateSection(true,nTriangleNormal);
-					FillingProceduralElements(NewComp, 0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					id_section++;
 				}
 			}
 			else
@@ -253,7 +263,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 				//Change the name for the next possible item
 				
 				CreateSection(true,nTriangleNormal);
-				FillingProceduralElements(NewComp, 0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				id_section++;
 			}
 		}
 	}
@@ -262,7 +273,7 @@ void AAGraphCoreElement::CreateProceduralSections()
 	{
 		if (It.Value().ArrayData.Num()>0)
 		{
-			UProceduralMeshComponent* NewComp = CreateProceduralElements("MyPMC_K",It.Key().ToString());
+			//UProceduralMeshComponent* NewComp = CreateProceduralElements("MyPMC_K",It.Key().ToString());
 			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
 			{
 				if(It.Value().ArrayData[i].bOrientationConnectNode)
@@ -279,7 +290,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 					//__________________________________________________________________________________________________
 					CreateSection(true,nTriangleNormal);
 					//__________________________________________________________________________________________________
-					FillingProceduralElements(NewComp, i, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					id_section++;
 				}
 			}
 		}
@@ -289,7 +301,7 @@ void AAGraphCoreElement::CreateProceduralSections()
 	{
 		if (It.Value().ArrayData.Num()>0)
 		{
-			UProceduralMeshComponent* NewComp = CreateProceduralElements("MyPMC_Kr",It.Key().ToString());
+			//UProceduralMeshComponent* NewComp = CreateProceduralElements("MyPMC_Kr",It.Key().ToString());
 			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
 			{
 				if(It.Value().ArrayData[i].bOrientationConnectNode)
@@ -314,7 +326,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 					vertices.Push(It.Value().ArrayData[i].PointStart_Rw);
 					
 					CreateSectionWall(true,nTriangleNormal);
-					FillingProceduralElements(NewComp, i, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					id_section++;
 				}
 			}
 		}
@@ -324,7 +337,7 @@ void AAGraphCoreElement::CreateProceduralSections()
 	{
 		if (It.Value().ArrayData.Num()>0)
 		{
-			UProceduralMeshComponent* NewComp = CreateProceduralElements("MyPMC_Kl",It.Key().ToString());
+			//UProceduralMeshComponent* NewComp = CreateProceduralElements("MyPMC_Kl",It.Key().ToString());
 			for(int i = 0; i < It.Value().ArrayData.Num(); i++)
 			{
 				if(It.Value().ArrayData[i].bOrientationConnectNode)
@@ -350,7 +363,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 					vertices.Push(It.Value().ArrayData[i].PointStart_Lw);
 					
 					CreateSectionWall(false,nTriangleNormal);
-					FillingProceduralElements(NewComp, i, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					id_section++;
 				}
 			}
 		}
@@ -358,7 +372,7 @@ void AAGraphCoreElement::CreateProceduralSections()
 	//узлы стены
 	for (auto It = DataConnectNode.CreateIterator(); It; ++It)
 	{
-		UProceduralMeshComponent* NewComp = CreateProceduralElements("PCM_N",It.Key().ToString());
+		//UProceduralMeshComponent* NewComp = CreateProceduralElements("PCM_N",It.Key().ToString());
 		if (It.Value().ArrayData.Num() > 2)
 		{
 			for(int i = 0; i < It.Value().ArrayData.Num()-1; i++)
@@ -377,7 +391,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 				bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[i].PointStart_R - It.Value().ArrayData[i+1].PointStart_L);
 				//______________________________________________________________________________________________________
 				CreateSectionWall(true,nTriangleNormal);
-				FillingProceduralElements(NewComp, i, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				id_section++;
 			}
 			//
 			ClearProceduralElements();
@@ -392,7 +407,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 			bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[It.Value().ArrayData.Num()-1].PointStart_L);
 			//______________________________________________________________________________________________________
 			CreateSectionWall(false,nTriangleNormal);
-			FillingProceduralElements(NewComp, It.Value().ArrayData.Num(), vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+			FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+			id_section++;
 		}
 		if (It.Value().ArrayData.Num() == 2)
 		{
@@ -417,7 +433,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 					bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[i].PointStart_R - It.Value().ArrayData[i+1].PointStart_L);
 					//______________________________________________________________________________________________________
 					CreateSectionWall(true,nTriangleNormal);
-					FillingProceduralElements(NewComp, i, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+					id_section++;
 				}
 				//__________________________________________________________________________________________________________
 				ClearProceduralElements();
@@ -432,7 +449,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 				bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[It.Value().ArrayData.Num()-1].PointStart_L);
 				//__________________________________________________________________________________________________________
 				CreateSectionWall(false,nTriangleNormal);
-				FillingProceduralElements(NewComp, It.Value().ArrayData.Num(), vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				id_section++;
 			}
 			else if ((a > g2))
 			{
@@ -463,7 +481,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 				bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[1].PointStart_L);
 				//______________________________________________________________________________________________________
 				CreateSectionWall(true,nTriangleNormal);
-				FillingProceduralElements(NewComp, 0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				id_section++;
 				//++
 				ClearProceduralElements();
 				if (n_vec.DotProduct(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[0].PointStart_L,It.Value().ArrayData[1].route_relatively_node) > 0)
@@ -490,7 +509,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 				bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[1].PointStart_L);
 				//______________________________________________________________________________________________________
 				CreateSectionWall(true,nTriangleNormal);
-				FillingProceduralElements(NewComp, 1, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				id_section++;
 			}
 			else if ((a < g1))
 			{
@@ -520,7 +540,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 				bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[1].PointStart_L);
 				//______________________________________________________________________________________________________
 				CreateSectionWall(true,nTriangleNormal);
-				FillingProceduralElements(NewComp, 0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				id_section++;
 				//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				ClearProceduralElements();
 				bool r = false;
@@ -550,7 +571,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 				bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[0].PointStart_R - It.Value().ArrayData[1].PointStart_L);
 				//______________________________________________________________________________________________________
 				CreateSectionWall(r,nTriangleNormal);
-				FillingProceduralElements(NewComp, 1, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				id_section++;
 			}
 		}
 		if (It.Value().ArrayData.Num() == 1)
@@ -569,7 +591,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 				bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[0].route_relatively_node);
 				//________________________________________________________________________________________________________
 				CreateSectionNode0(true,nTriangleNormal);
-				FillingProceduralElements(NewComp, 0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				id_section++;
 			}
 			else
 			{
@@ -585,7 +608,8 @@ void AAGraphCoreElement::CreateProceduralSections()
 				bY_target = UBFL_MathGraph::FindFocusVecToVecByY(It.Value().ArrayData[0].route_relatively_node);
 				//________________________________________________________________________________________________________
 				CreateSectionNode0(false,nTriangleNormal);
-				FillingProceduralElements(NewComp, 0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				FillingProceduralElements(NewComp, id_section, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
+				id_section++;
 			}
 		}
 	}
@@ -822,8 +846,8 @@ void AAGraphCoreElement::CreateSection(bool bReverseTriangle,TArray<FVector> nTN
 	for (int32 i1 = 0; i1 < vertices.Num(); i1++) {
 		float X = (vertices[i1].X - minimumX) / 50.0f;
 		float Y = (vertices[i1].Y - minimumY) / 50.0f;
-		UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX X COORDINATE IS %d -=-=-=-="), X);
-		UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX Y COORDINATE IS %d -=-=-=-="), Y);
+		//UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX X COORDINATE IS %d -=-=-=-="), X);
+		//UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX Y COORDINATE IS %d -=-=-=-="), Y);
 		UV0.Add(FVector2D(X, Y));
 	}
 	vertexXCoordinates.Empty();
@@ -960,8 +984,8 @@ void AAGraphCoreElement::CreateSectionWall(bool bReverseTriangle,TArray<FVector>
 		for (int32 i1 = 0; i1 < vertices.Num(); i1++) {
 			float X = (vertices[i1].X - minimumX) / 50.0f;
 			float Y = (vertices[i1].Z - minimumZ) / 50.0f;
-			UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX X COORDINATE IS %d -=-=-=-="), X);
-			UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX Y COORDINATE IS %d -=-=-=-="), Y);
+			//UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX X COORDINATE IS %d -=-=-=-="), X);
+			//UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX Y COORDINATE IS %d -=-=-=-="), Y);
 			UV0.Add(FVector2D(X, Y));
 		}
 	}
@@ -973,8 +997,8 @@ void AAGraphCoreElement::CreateSectionWall(bool bReverseTriangle,TArray<FVector>
 		for (int32 i1 = 0; i1 < vertices.Num(); i1++) {
 			float X = (vertices[i1].Y - minimumY) / 50.0f;
 			float Y = (vertices[i1].Z - minimumZ) / 50.0f;
-			UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX X COORDINATE IS %d -=-=-=-="), X);
-			UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX Y COORDINATE IS %d -=-=-=-="), Y);
+			//UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX X COORDINATE IS %d -=-=-=-="), X);
+			//UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX Y COORDINATE IS %d -=-=-=-="), Y);
 			UV0.Add(FVector2D(X, Y));
 		}
 	}
@@ -1059,8 +1083,8 @@ void AAGraphCoreElement::CreateSectionNode(bool bReverseTriangle,TArray<FVector>
 		for (int32 i1 = 0; i1 < vertices.Num(); i1++) {
 			float X = (vertices[i1].X - minimumX) / 50.0f;
 			float Y = (vertices[i1].Z - minimumZ) / 50.0f;
-			UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX X COORDINATE IS %d -=-=-=-="), X);
-			UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX Y COORDINATE IS %d -=-=-=-="), Y);
+			//UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX X COORDINATE IS %d -=-=-=-="), X);
+			//UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX Y COORDINATE IS %d -=-=-=-="), Y);
 			UV0.Add(FVector2D(X, Y));
 		}
 	}
@@ -1072,8 +1096,8 @@ void AAGraphCoreElement::CreateSectionNode(bool bReverseTriangle,TArray<FVector>
 		for (int32 i1 = 0; i1 < vertices.Num(); i1++) {
 			float X = (vertices[i1].Y - minimumY) / 50.0f;
 			float Y = (vertices[i1].Z - minimumZ) / 50.0f;
-			UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX X COORDINATE IS %d -=-=-=-="), X);
-			UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX Y COORDINATE IS %d -=-=-=-="), Y);
+			//UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX X COORDINATE IS %d -=-=-=-="), X);
+			//UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX Y COORDINATE IS %d -=-=-=-="), Y);
 			UV0.Add(FVector2D(X, Y));
 		}
 	}
@@ -1212,8 +1236,8 @@ void AAGraphCoreElement::CreateSectionNode0(bool bReverseTriangle,TArray<FVector
 		for (int32 i1 = 0; i1 < vertices.Num(); i1++) {
 			float X = (vertices[i1].X - minimumX) / 50.0f;
 			float Y = (vertices[i1].Z - minimumZ) / 50.0f;
-			UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX X COORDINATE IS %d -=-=-=-="), X);
-			UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX Y COORDINATE IS %d -=-=-=-="), Y);
+			//UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX X COORDINATE IS %d -=-=-=-="), X);
+			//UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX Y COORDINATE IS %d -=-=-=-="), Y);
 			UV0.Add(FVector2D(X, Y));
 		}
 	}
@@ -1225,8 +1249,8 @@ void AAGraphCoreElement::CreateSectionNode0(bool bReverseTriangle,TArray<FVector
 		for (int32 i1 = 0; i1 < vertices.Num(); i1++) {
 			float X = (vertices[i1].Y - minimumY) / 50.0f;
 			float Y = (vertices[i1].Z - minimumZ) / 50.0f;
-			UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX X COORDINATE IS %d -=-=-=-="), X);
-			UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX Y COORDINATE IS %d -=-=-=-="), Y);
+			//UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX X COORDINATE IS %d -=-=-=-="), X);
+			//UE_LOG(LogEngine, Warning, TEXT("-=-=-=-=-=-=-=-= NORMALIZED VERTEX Y COORDINATE IS %d -=-=-=-="), Y);
 			UV0.Add(FVector2D(X, Y));
 		}
 	}
@@ -1291,7 +1315,7 @@ void AAGraphCoreElement::SearchNodesInTheWorld()
 void AAGraphCoreElement::SearchBranches()
 {
 	DataConnectNode.Empty();
-	UE_LOG(LogTemp, Warning, TEXT("СОБИРАЕМ УЗЛЫ: %d"), 0);
+	UE_LOG(LogTemp, Warning, TEXT("СОБИРАЕМ УЗЛЫ: %d"), TNodes.Num());
 	for(int i = 0; i < TNodes.Num(); i++)
 	{
 		FGuid g = II_GraphAction::Execute_IGetGUID(TNodes[i]);

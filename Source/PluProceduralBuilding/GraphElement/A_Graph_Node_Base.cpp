@@ -13,6 +13,10 @@ AA_Graph_Node_Base::AA_Graph_Node_Base()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	Base_Root_MyScene = CreateDefaultSubobject<USceneComponent>(TEXT("Root_Scene"));
+	//Base_Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base_Mesh"));
+	RootComponent = Base_Root_MyScene;
+	//Base_Mesh->SetupAttachment(RootComponent);
 }
 FGuid AA_Graph_Node_Base::IGetGUID_Implementation()
 {
@@ -41,6 +45,24 @@ void AA_Graph_Node_Base::IAddNode_Implementation(AActor* node, bool bTypeConnect
 	FConnectionType ct;
 	ct.bOrientationConnectNode = bTypeConnect;
 }
+
+void AA_Graph_Node_Base::IAddConnectionNode_Implementation(AActor* node, bool bTypeConnect, int wigth)
+{
+	FConnectionType ct;
+	ct.aConnectionNode = node;
+	ct.bOrientationConnectNode = bTypeConnect;
+	ct.wightBranch = wigth;
+	ConnectionNodes.ArrayData.Add(ct);
+	if (node != nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("node != nullptr: %d"), 0);
+	}
+	else if (node == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("node == nullptr: %d"), 1);
+	}
+}
+
 void AA_Graph_Node_Base::IAddBranch_Implementation(AActor* br)
 {
 	ConnectionBranch.Add(br);

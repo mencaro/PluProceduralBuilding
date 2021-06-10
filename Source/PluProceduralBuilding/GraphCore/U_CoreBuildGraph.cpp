@@ -8,85 +8,11 @@ UWorld* UU_CoreBuildGraph::GetWorld() const
 	else if (GetOuter()) return GetOuter()->GetWorld();
 	else return nullptr;
 }
-void UU_CoreBuildGraph::IGraphRebuildCircuit_Implementation()
-{
-	/*GLog->Log("GraphRebuildCircuit_Start");	
-	TNodes.Empty();
-	TBranches.Empty();
-	TNodes.Reset(100);
-	TBranches.Reset(100);
-	TNodes = SearchNodes();
-	SearchBranches();
-	SearchReverseBranches();
-	II_GraphAction::Execute_IGraphRebuildNodeSpace(this);
-	//сформировать составляющие узла
-	GLog->Log("GraphRebuildCircuit_End");*/
-}
 TArray<AActor*> UU_CoreBuildGraph::SearchNodes()
 {
 	TArray<AActor*> foundEnemies;
 	GetAllActorsLevel(foundEnemies);
 	return foundEnemies;
-}
-
-void UU_CoreBuildGraph::SearchBranches()
-{
-	/*
-	for(int i = 0; i < TNodes.Num(); i++)
-	{
-		TArray<FConnectionType> connections_ = II_GraphAction::Execute_IGetConnectionNode(TNodes[i]);
-		if (connections_.Num()>0)
-		{
-			for(int j = 0; j < connections_.Num(); j++)
-			{
-				if (connections_[j].bOrientationConnectNode)
-				{
-					AActor* SpawnedActor1 = GetWorld()->SpawnActor(AA_Graph_Branch_Base::StaticClass(), &TNodes[i]->GetActorTransform());
-					II_GraphAction::Execute_IAddNode(SpawnedActor1, TNodes[i], true, connections_[j].wightBranch);
-					II_GraphAction::Execute_IAddNode(SpawnedActor1, connections_[j].aConnectionNode, false, connections_[j].wightBranch);
-					II_GraphAction::Execute_IGraphRebuildSplinePoint(SpawnedActor1);
-					connections_[j].aConnectionBranch = SpawnedActor1;
-					//настроить ветку, дать координары
-					TBranches.Add(SpawnedActor1);
-				}
-			}
-			II_GraphAction::Execute_ISetConnectionNode(TNodes[i], connections_);
-		}
-		//если нет коннектов
-		if (connections_.Num()==0)
-		{
-			//удалить ноду
-		}
-	}
-	*/
-}
-
-void UU_CoreBuildGraph::SearchReverseBranches()
-{
-	/*for(int i = 0; i < TNodes.Num(); i++)
-	{
-		TArray<FConnectionType> connections_ = II_GraphAction::Execute_IGetConnectionNode(TNodes[i]);
-		if (connections_.Num()>0)
-		{
-			for(int j = 0; j < connections_.Num(); j++)
-			{
-				if (!connections_[j].bOrientationConnectNode)
-				{
-					FConnectionType searchReverseNode = II_GraphAction::Execute_ISearchBranchFromNodes(connections_[j].aConnectionNode,TNodes[i]);
-					if (searchReverseNode.aConnectionNode != nullptr)
-					{
-						connections_[j].aConnectionBranch = searchReverseNode.aConnectionBranch;
-					}
-				}
-			}
-		}
-		II_GraphAction::Execute_ISetConnectionNode(TNodes[i], connections_);
-	}*/
-}
-void UU_CoreBuildGraph::IGraphRebuildNodeSpace_Implementation()
-{
-	for (int i = 0; i < TNodes.Num(); i++)
-		II_GraphAction::Execute_IGraphRebuildNodeSpace(TNodes[i]);
 }
 
 void UU_CoreBuildGraph::GetAllActorsLevel(TArray<AActor*> &foundEnemies)
@@ -99,4 +25,48 @@ void UU_CoreBuildGraph::GetAllActorsLevel(TArray<AActor*> &foundEnemies)
 void UU_CoreBuildGraph::GetAllActorsLevelWithMyInterfase(TSubclassOf<UInterface> myInterfase, TArray<AActor*> &foundEnemies)
 {
 	UGameplayStatics::GetAllActorsWithInterface(GetWorld(), myInterfase, foundEnemies);
+}
+
+void UU_CoreBuildGraph::SetAllData(TMap<int, FVector> DataNodes_, TArray<FIntPoint> DataBranches_)
+{
+	DataNodes = DataNodes_;
+	DataBranches = DataBranches_;
+}
+
+void UU_CoreBuildGraph::SpawnNodes()
+{
+	DataNodesActors.Empty();
+	FVector a;
+	UE_LOG(LogTemp, Warning, TEXT("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA: %d"), 0);
+	for (auto It = DataNodes.CreateIterator(); It; ++It)
+	{
+		a = It.Value();
+		break;
+	}
+	//
+	int r = 0;
+	for (auto It = DataNodes.CreateIterator(); It; ++It)
+	{
+		//
+		FVector b = (It.Value() - a) * 100;
+		//
+		UE_LOG(LogTemp, Warning, TEXT("_It_Key_: %d"), It.Key());
+		DataNodesActors.Add(It.Key(),FSpawnActors(AA_Graph_Node_Base::StaticClass(),FTransform(FRotator(0.0,0.0,0.0),b, FVector(1,1,1))));
+		/*r++;
+		if (r > 20)
+			break;*/
+	}
+	for (int i = 0; i < DataBranches.Num(); i++)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("_It_Key_: %d"), i);
+		if (DataNodesActors.Contains(DataBranches[i].X) && DataNodesActors.Contains(DataBranches[i].Y))
+			II_GraphAction::Execute_IAddConnectionNode(DataNodesActors[ DataBranches[i].X ], DataNodesActors[ DataBranches[i].Y ], true, 200);
+	}
+}
+
+AActor* UU_CoreBuildGraph::FSpawnActors(UClass* class_obj, FTransform SpawnLocation)
+{
+	AActor* SpawnedActor1 = GetWorld()->SpawnActor(class_obj, &SpawnLocation);
+	GLog->Log("Constructor::AddActor");
+	return SpawnedActor1;
 }

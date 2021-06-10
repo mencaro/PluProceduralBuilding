@@ -28,6 +28,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
         void IAddNode(AActor* node, bool bTypeConnect, int wigth);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
+		void IAddConnectionNode(AActor* node, bool bTypeConnect, int wigth);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
         void IAddBranch(AActor* br);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "My_interfaces|GraphSystem")
         FArrayConnectionType IGetConnectionNode();

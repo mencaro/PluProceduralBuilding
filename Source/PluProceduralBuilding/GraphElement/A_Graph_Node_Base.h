@@ -20,6 +20,8 @@ public:
 	// Sets default values for this actor's properties
 	AA_Graph_Node_Base();
 	FGuid NodeGUID;
+	UPROPERTY(VisibleDefaultsOnly,BlueprintReadWrite, Category = "MyComponent")
+		USceneComponent* Base_Root_MyScene;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -33,9 +35,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int HeightRange = 200;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int RangeNodeSpace = 200;
+		int RangeNodeSpace = 400;
 	///добавление узла связи в графе
 	void IAddNode_Implementation(AActor* node, bool bTypeConnect, int wigth) override;
+	void IAddConnectionNode_Implementation(AActor* node, bool bTypeConnect, int wigth) override;
 	void IAddBranch_Implementation(AActor* br) override;
 	int IGetRangeOuts_Implementation() override;
 	int IGetHeightNode_Implementation() override;
