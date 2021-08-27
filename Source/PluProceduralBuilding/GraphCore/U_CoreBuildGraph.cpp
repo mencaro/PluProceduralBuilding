@@ -44,7 +44,6 @@ void UU_CoreBuildGraph::SpawnNodes()
 		break;
 	}
 	//
-	int r = 0;
 	for (auto It = DataNodes.CreateIterator(); It; ++It)
 	{
 		//
@@ -52,9 +51,7 @@ void UU_CoreBuildGraph::SpawnNodes()
 		//
 		UE_LOG(LogTemp, Warning, TEXT("_It_Key_: %d"), It.Key());
 		DataNodesActors.Add(It.Key(),FSpawnActors(AA_Graph_Node_Base::StaticClass(),FTransform(FRotator(0.0,0.0,0.0),b, FVector(1,1,1))));
-		/*r++;
-		if (r > 20)
-			break;*/
+		//
 	}
 	for (int i = 0; i < DataBranches.Num(); i++)
 	{

@@ -752,14 +752,16 @@ void AAGraphCoreElement::GraphRebuildNodeSpace()
 
 UProceduralMeshComponent* AAGraphCoreElement::CreateProceduralElements(FString NameElementsPrefix,FString NameElements)
 {
-	//Change the name for the next possible item
 	const FString Str1 = NameElementsPrefix + NameElements;
-	//Convert the FString to FName
 	const FName InitialName1 = (*Str1);
 	UProceduralMeshComponent* NewComp = NewObject<UProceduralMeshComponent>(this, UProceduralMeshComponent::StaticClass(),InitialName1);
 	NewComp->RegisterComponent();
 	NewComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
 	NewComp->bUseAsyncCooking = true;
+	NewComp->bUseComplexAsSimpleCollision = true;
+	NewComp->SetMobility(EComponentMobility::Static);
+	NewComp->SetEnableGravity(false);
+	NewComp->ContainsPhysicsTriMeshData(false);
 	return NewComp;
 }
 
@@ -772,11 +774,11 @@ void AAGraphCoreElement::FillingProceduralElements(UProceduralMeshComponent* PC,
 	PC->CreateMeshSection_LinearColor(Id_section, V, Tr, N, UV, LC, PMT, CollisionEnable);
 	// if (isSideWalkType == true) mesh->SetMaterial(0, Material1);
 	// else mesh->SetMaterial(0, Material0);
-	PC->ContainsPhysicsTriMeshData(true); //Enable collision data
+	//PC->ContainsPhysicsTriMeshData(true); //Enable collision data
 	//mesh->bUseComplexAsSimpleCollision = false;
 	//mesh->AddCollisionConvexMesh(vertices);
-	PC->SetMobility(EComponentMobility::Static);
-	PC->SetEnableGravity(false);
+	//PC->SetMobility(EComponentMobility::Static);
+	//PC->SetEnableGravity(false);
 	ProceduralMeshes.Add(PC);
 }
 
